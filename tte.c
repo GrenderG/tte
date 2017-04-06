@@ -13,11 +13,13 @@
 #include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <termios.h>
+#include <time.h>
 #include <unistd.h>
 
 /*** Define section ***/
@@ -51,6 +53,9 @@ struct editor_config {
 	int screen_cols;
 	int num_rows;
 	editor_row* row;
+	char* file_name;
+	char status_msg[80];
+	time_t status_msg_time;
 	struct termios orig_termios;
 } ec;
 
@@ -289,6 +294,9 @@ void editorAppendRow(char* s, size_t line_len) {
 /*** File I/O ***/
 
 void editorOpen(char* file_name) {
+	free(ec.file_name);
+	ec.file_name = strdup(file_name);
+
 	FILE* file = fopen(file_name, "r");
 	if (!file)
 		die("Failed to open the file");
@@ -355,6 +363,50 @@ void editorScroll() {
 		ec.col_offset = ec.render_x - ec.screen_cols + 1;
 }
 
+void editorDrawStatusBar(struct a_buf* ab) {
+	// This switches to inverted colors.
+	// NOTE:
+	// The m command (Select Graphic Rendition) causes the text printed 
+	// after it to be printed with various possible attributes including 
+	// bold (1), underscore (4), blink (5), and inverted colors (7). An
+	// argument of 0 clears all attributes (the default one). See
+	// http://vt100.net/docs/vt100-ug/chapter3.html#SGR for more info.
+	abufAppend(ab, "\x1b[7m", 4);
+
+	char status[80], r_status[80];
+	// Showing up to 20 characters of the filename, followed by the number of lines.
+	int len = snprintf(status, sizeof(status), "%.20s - %d lines", ec.file_name ? ec.file_name : "New file", ec.num_rows);
+	int r_len = snprintf(r_status, sizeof(r_status), "%d/%d", ec.cursor_y + 1, ec.num_rows);
+	if (len > ec.screen_cols)
+		len = ec.screen_cols;
+	abufAppend(ab, status, len);
+	while (len < ec.screen_cols) {
+		if (ec.screen_cols - len == r_len) {
+			abufAppend(ab, r_status, r_len);
+			break;
+		} else {
+			abufAppend(ab, " ", 1);
+			len++;
+		}
+	}
+	// This switches back to normal colors.
+	abufAppend(ab, "\x1b[m", 3);
+
+	abufAppend(ab, "\r\n", 2);
+}
+
+void editorDrawMessageBar(struct a_buf *ab) {
+	// Clearing the message bar.
+	abufAppend(ab, "\x1b[K", 3);
+	int msg_len = strlen(ec.status_msg);
+	if (msg_len > ec.screen_cols)
+		msg_len = ec.screen_cols;
+	// We only show the message if its less than 5 secons old, but
+	// remember the screen is only being refreshed after each keypress.
+	if (msg_len && time(NULL) - ec.status_msg_time < 5)
+		abufAppend(ab, ec.status_msg, msg_len);
+}
+
 void editorDrawWelcomeMessage(struct a_buf* ab) {
 	char welcome[80];
 	// Using snprintf to truncate message in case the terminal
@@ -373,6 +425,26 @@ void editorDrawWelcomeMessage(struct a_buf* ab) {
 	while (padding--)
 		abufAppend(ab, " ", 1);
 	abufAppend(ab, welcome, welcome_len);
+}
+
+// The ... argument makes editorSetStatusMessage() a variadic function, 
+// meaning it can take any number of arguments. C’s way of dealing with 
+// these arguments is by having you call va_start() and va_end() on a 
+// // value of type va_list. The last argument before the ... (in this 
+// case, msg) must be passed to va_start(), so that the address of 
+// the next arguments is known. Then, between the va_start() and 
+// va_end() calls, you would call va_arg() and pass it the type of 
+// the next argument (which you usually get from the given format 
+// string) and it would return the value of that argument. In 
+// this case, we pass msg and args to vsnprintf() and it takes care 
+// of reading the format string and calling va_arg() to get each 
+// argument.
+void editorSetStatusMessage(const char* msg, ...) {
+	va_list args;
+	va_start(args, msg);
+	vsnprintf(ec.status_msg, sizeof(ec.status_msg), msg, args);
+	va_end(args);
+	ec.status_msg_time = time(NULL);
 }
 
 void editorDrawRows(struct a_buf* ab) {
@@ -398,10 +470,8 @@ void editorDrawRows(struct a_buf* ab) {
 
 		// Redrawing each line instead of the whole screen.
 		abufAppend(ab, "\x1b[K", 3);
-		// Addind a new line only if we are not printing the
-		// last tilde.
-		if (y < ec.screen_rows - 1)
-			abufAppend(ab, "\r\n", 2);
+		// Addind a new line
+		abufAppend(ab, "\r\n", 2);
 	}
 }
 
@@ -417,6 +487,8 @@ void editorRefreshScreen() {
 	abufAppend(&ab, "\x1b[H", 3);
 
 	editorDrawRows(&ab);
+	editorDrawStatusBar(&ab);
+	editorDrawMessageBar(&ab);
 	
 	// Moving the cursor where it should be.
 	char buf[32];
@@ -517,7 +589,8 @@ void editorProcessKeypress() {
 			ec.cursor_x = 0;
 			break;
 		case END_KEY:
-			ec.cursor_x = ec.screen_cols - 1;
+			if (ec.cursor_y < ec.num_rows)
+				ec.cursor_x = ec.row[ec.cursor_y].size;
 			break;
 	}
 }
@@ -532,9 +605,14 @@ void initEditor() {
 	ec.col_offset = 0;
 	ec.num_rows = 0;
 	ec.row = NULL;
+	ec.file_name = NULL;
+	ec.status_msg[0] = '\0';
+	ec.status_msg_time = 0;
 
 	if (getWindowSize(&ec.screen_rows, &ec.screen_cols) == -1)
 		die("Failed to get window size");
+
+	ec.screen_rows -= 2;
 }
 
 int main(int argc, char* argv[]) {
@@ -542,6 +620,8 @@ int main(int argc, char* argv[]) {
 	initEditor();
 	if (argc >= 2)
 		editorOpen(argv[1]);
+
+	editorSetStatusMessage("Ctrl-Q to quit");
 
 	while (1) {
 		editorRefreshScreen();
