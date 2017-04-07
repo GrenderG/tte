@@ -718,7 +718,7 @@ char* editorPrompt(char* prompt) {
 				editorSetStatusMessage("");
 				return buf;
 			}
-		} else if (isprint(c)) {
+		} else if (!iscntrl(c)) {
 			if (buf_len == buf_size - 1) {
 				buf_size *= 2;
 				buf = realloc(buf, buf_size);
