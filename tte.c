@@ -665,8 +665,13 @@ void editorDrawStatusBar(struct a_buf* ab) {
 	char status[80], r_status[80];
 	// Showing up to 20 characters of the filename, followed by the number of lines.
 	int len = snprintf(status, sizeof(status), "Editing: %.20s %s", ec.file_name ? ec.file_name : "New file", ec.dirty ? "(modified)" : "");
+	int col_size;
+	if (ec.row && ec.cursor_y <= ec.num_rows - 1)
+		col_size = ec.row[ec.cursor_y].size;
+	else
+		col_size = 0;
 	int r_len = snprintf(r_status, sizeof(r_status), "%d/%d lines  %d/%d cols", ec.cursor_y + 1 > ec.num_rows ? ec.num_rows : ec.cursor_y + 1, ec.num_rows,
-		ec.cursor_x + 1 > ec.row[ec.cursor_y].size ? ec.row[ec.cursor_y].size : ec.cursor_x + 1, ec.row[ec.cursor_y].size);
+		ec.cursor_x + 1 > col_size ? col_size : ec.cursor_x + 1, col_size);
 	if (len > ec.screen_cols)
 		len = ec.screen_cols;
 	abufAppend(ab, status, len);
