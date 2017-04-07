@@ -99,7 +99,7 @@ void abufFree();
 
 void abufAppend();
 
-char *editorPrompt(char* prompt);
+char *editorPrompt(char* prompt, void (*callback)(char*, int));
 
 /*** Terminal section ***/
 
@@ -527,7 +527,7 @@ void editorOpen(char* file_name) {
 
 void editorSave() {
 	if (ec.file_name == NULL) {
-		ec.file_name = editorPrompt("Save as: %s (ESC to cancel)");
+		ec.file_name = editorPrompt("Save as: %s (ESC to cancel)", NULL);
 		if (ec.file_name == NULL) {
 			editorSetStatusMessage("Save aborted");
 			return;
@@ -561,9 +561,10 @@ void editorSave() {
 
 /*** Search section ***/
 
-void editorSearch() {
-	char* query = editorPrompt("Search: %s (ESC to cancel)");
-	if (query == NULL)
+void editorSearchCallback(char* query, int key) {
+	// Checking if the user pressed Enter or Escape, in which case 
+	// they are leaving search mode so we return immediately.
+	if (key == '\r' || key == '\x1b')
 		return;
 
 	int i;
@@ -583,8 +584,26 @@ void editorSearch() {
 			break;
 		}
 	}
+}
 
-	free(query);
+void editorSearch() {
+	int saved_cursor_x = ec.cursor_x;
+	int saved_cursor_y = ec.cursor_y;
+	int saved_col_offset = ec.col_offset;
+	int saved_row_offset = ec.row_offset;
+
+	char* query = editorPrompt("Search: %s (ESC to cancel)", editorSearchCallback);
+
+	if (query) {
+		free(query);
+	// If query is NULL, that means they pressed Escape, so in that case we 
+	// restore the cursor previous position.
+	} else {
+		ec.cursor_x = saved_cursor_x;
+		ec.cursor_y = saved_cursor_y;
+		ec.col_offset = saved_col_offset;
+		ec.row_offset = saved_row_offset;
+	}
 }
 
 /*** Append buffer section **/
@@ -645,8 +664,9 @@ void editorDrawStatusBar(struct a_buf* ab) {
 
 	char status[80], r_status[80];
 	// Showing up to 20 characters of the filename, followed by the number of lines.
-	int len = snprintf(status, sizeof(status), "%.20s - %d lines %s", ec.file_name ? ec.file_name : "New file", ec.num_rows, ec.dirty ? "(modified)" : "");
-	int r_len = snprintf(r_status, sizeof(r_status), "%d/%d", ec.cursor_y + 1 > ec.num_rows ? ec.num_rows : ec.cursor_y + 1, ec.num_rows);
+	int len = snprintf(status, sizeof(status), "Editing: %.20s %s", ec.file_name ? ec.file_name : "New file", ec.dirty ? "(modified)" : "");
+	int r_len = snprintf(r_status, sizeof(r_status), "%d/%d lines  %d/%d cols", ec.cursor_y + 1 > ec.num_rows ? ec.num_rows : ec.cursor_y + 1, ec.num_rows,
+		ec.cursor_x + 1 > ec.row[ec.cursor_y].size ? ec.row[ec.cursor_y].size : ec.cursor_x + 1, ec.row[ec.cursor_y].size);
 	if (len > ec.screen_cols)
 		len = ec.screen_cols;
 	abufAppend(ab, status, len);
@@ -789,7 +809,7 @@ void editorClearScreen() {
 
 /*** Input section ***/
 
-char* editorPrompt(char* prompt) {
+char* editorPrompt(char* prompt, void (*callback)(char*, int)) {
 	size_t buf_size = 128;
 	char* buf = malloc(buf_size);
 
@@ -806,11 +826,15 @@ char* editorPrompt(char* prompt) {
 				buf[--buf_len] = '\0';
 		} else if (c == '\x1b') {
 			editorSetStatusMessage("");
+			if (callback)
+				callback(buf, c);
 			free(buf);
 			return NULL;
 		} else if (c == '\r') {
 			if (buf_len != 0) {
 				editorSetStatusMessage("");
+				if (callback)
+					callback(buf, c);
 				return buf;
 			}
 		} else if (!iscntrl(c)) {
@@ -821,6 +845,9 @@ char* editorPrompt(char* prompt) {
 			buf[buf_len++] = c;
 			buf[buf_len] = '\0';
 		}
+
+		if (callback)
+			callback(buf, c);
 	}
 }
 
