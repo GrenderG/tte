@@ -1,7 +1,7 @@
 /*** Include section ***/
 
 // We add them above our includes, because the header 
-// files we’re including use the macros to decide what 
+// files we are including use the macros to decide what 
 // features to expose. These macros remove some compilation
 // warnings. See
 // https://www.gnu.org/software/libc/manual/html_node/Feature-Test-Macros.html
@@ -13,6 +13,7 @@
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -88,7 +89,15 @@ enum editor_key {
 
 void editorClearScreen();
 
+void editorRefreshScreen();
+
 void editorSetStatusMessage(const char* msg, ...);
+
+void consoleBufferOpen();
+
+void abufFree();
+
+void abufAppend();
 
 char *editorPrompt(char* prompt);
 
@@ -141,6 +150,8 @@ void enableRawMode() {
 	// Forcing read() function to return every 1/10 of a 
 	// second if there is nothing to read.
 	raw.c_cc[VTIME] = 1;
+
+	consoleBufferOpen();
 
 	if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1)
 		die("Failed to set raw mode");
@@ -229,12 +240,54 @@ int getWindowSize(int* screen_rows, int* screen_cols) {
 	}
 }
 
+void editorUpdateWindowSize() {
+	if (getWindowSize(&ec.screen_rows, &ec.screen_cols) == -1)
+		die("Failed to get window size");
+	ec.screen_rows -= 2; // Room for the status bar.
+}
+
+void editorHandleSigwinch() {
+	editorUpdateWindowSize();
+	if (ec.cursor_y > ec.screen_rows)
+		ec.cursor_y = ec.screen_rows - 1;
+	if (ec.cursor_x > ec.screen_cols)
+		ec.cursor_x = ec.screen_cols - 1;
+	editorRefreshScreen();
+}
+
+void consoleBufferOpen() {
+	// Switch to another terminal buffer in order to be able to restore state at exit
+    // by calling consoleBufferClose().
+    if (write(STDOUT_FILENO, "\x1b[?47h", 6) == -1)
+    	die("Error changing terminal buffer");
+}
+
+void consoleBufferClose() {
+	// Restore console to the state tte opened.
+	if (write(STDOUT_FILENO, "\x1b[?9l", 5) == -1 ||
+		write(STDOUT_FILENO, "\x1b[?47l", 6) == -1)
+		die("Error restoring buffer state");
+
+	/*struct a_buf ab = {.buf = NULL, .len = 0};
+	char* buf = NULL;
+	if (asprintf(&buf, "\x1b[%d;%dH\r\n", ec.screen_rows + 1, 1) == -1)
+		die("Error restoring buffer state");
+	abufAppend(&ab, buf, strlen(buf));
+	free(buf);
+
+	if (write(STDOUT_FILENO, ab.buf, ab.len) == -1)
+		die("Error restoring buffer state");
+	abufFree(&ab);*/
+
+	editorClearScreen();
+}
+
 /*** Row operations ***/
 
 int editorRowCursorXToRenderX(editor_row* row, int cursor_x) {
 	int render_x = 0;
 	int j;
-	// For each character, if it’s a tab we use rx % TTE_TAB_STOP 
+	// For each character, if its a tab we use rx % TTE_TAB_STOP 
 	// to find out how many columns we are to the right of the last 
 	// tab stop, and then subtract that from TTE_TAB_STOP - 1 to 
 	// find out how many columns we are to the left of the next tab 
@@ -250,13 +303,27 @@ int editorRowCursorXToRenderX(editor_row* row, int cursor_x) {
 	return render_x;
 }
 
+int editorRowRenderXToCursorX(editor_row* row, int render_x) {
+	int cur_render_x = 0;
+	int cursor_x;
+	for (cursor_x = 0; cursor_x < row -> size; cursor_x++) {
+		if (row -> chars[cursor_x] == '\t')
+			cur_render_x += (TTE_TAB_STOP - 1) - (cur_render_x % TTE_TAB_STOP);
+		cur_render_x++;
+
+		if (cur_render_x > render_x)
+			return cursor_x;
+	}
+	return cursor_x;
+}
+
 void editorUpdateRow(editor_row* row) {
 	// First, we have to loop through the chars of the row 
 	// and count the tabs in order to know how much memory 
 	// to allocate for render. The maximum number of characters 
 	// needed for each tab is 8. row->size already counts 1 for 
 	// each tab, so we multiply the number of tabs by 7 and add 
-	// that to row->size to get the maximum amount of memory we’ll 
+	// that to row->size to get the maximum amount of memory we'll 
 	// need for the rendered row.
 	int tabs = 0;
 	int j;
@@ -335,11 +402,11 @@ void editorRowInsertChar(editor_row* row, int at, int c) {
 }
 
 void editorInsertNewline() {
-	// If we’re at the beginning of a line, all we have to do is insert 
-	// a new blank row before the line we’re on.
+	// If we're at the beginning of a line, all we have to do is insert 
+	// a new blank row before the line we're on.
 	if (ec.cursor_x == 0) {
 		editorInsertRow(ec.cursor_y, "", 0);
-	// Otherwise, we have to split the line we’re on into two rows.
+	// Otherwise, we have to split the line we're on into two rows.
 	} else {
 		editor_row* row = &ec.row[ec.cursor_y];
 		editorInsertRow(ec.cursor_y + 1, &row -> chars[ec.cursor_x], row -> size - ec.cursor_x);
@@ -492,6 +559,34 @@ void editorSave() {
 	editorSetStatusMessage("Cant's save file. Error occurred: %s", strerror(errno));
 }
 
+/*** Search section ***/
+
+void editorSearch() {
+	char* query = editorPrompt("Search: %s (ESC to cancel)");
+	if (query == NULL)
+		return;
+
+	int i;
+	for (i = 0; i < ec.num_rows; i++) {
+		editor_row* row = &ec.row[i];
+		// We use strstr to check if query is a substring of the
+		// current row. It returns NULL if there is no match,
+		// oterwhise it returns a pointer to the matching substring.
+		char* match = strstr(row -> render, query);
+		if (match) {
+			ec.cursor_y = i;
+			ec.cursor_x = editorRowRenderXToCursorX(row, match - row -> render);
+			// We set this like so to scroll to the bottom of the file so
+			// that the next screen refresh will cause the matching line to
+			// be at the very top of the screen.
+			ec.row_offset = ec.num_rows;
+			break;
+		}
+	}
+
+	free(query);
+}
+
 /*** Append buffer section **/
 
 void abufAppend(struct a_buf* ab, const char* s, int len) {
@@ -524,8 +619,8 @@ void editorScroll() {
 	// The first if statement checks if the cursor is above the visible window, 
 	// and if so, scrolls up to where the cursor is. The second if statement checks 
 	// if the cursor is past the bottom of the visible window, and contains slightly 
-	// more complicated arithmetic because ec.row_offset refers to what’s at the top 
-	// of the screen, and we have to get ec.screen_rows involved to talk about what’s 
+	// more complicated arithmetic because ec.row_offset refers to what's at the top 
+	// of the screen, and we have to get ec.screen_rows involved to talk about what's 
 	// at the bottom of the screen.
 	if (ec.cursor_y < ec.row_offset)
 		ec.row_offset = ec.cursor_y;
@@ -603,7 +698,7 @@ void editorDrawWelcomeMessage(struct a_buf* ab) {
 }
 
 // The ... argument makes editorSetStatusMessage() a variadic function, 
-// meaning it can take any number of arguments. C’s way of dealing with 
+// meaning it can take any number of arguments. C's way of dealing with 
 // these arguments is by having you call va_start() and va_end() on a 
 // // value of type va_list. The last argument before the ... (in this 
 // case, msg) must be passed to va_start(), so that the address of 
@@ -784,6 +879,7 @@ void editorProcessKeypress() {
 				return;
 			}
 			editorClearScreen();
+			consoleBufferClose();
 			exit(0);
 			break;
 		case CTRL_KEY('s'):
@@ -814,6 +910,9 @@ void editorProcessKeypress() {
 		case END_KEY:
 			if (ec.cursor_y < ec.num_rows)
 				ec.cursor_x = ec.row[ec.cursor_y].size;
+			break;
+		case CTRL_KEY('f'):
+			editorSearch();
 			break;
 		case BACKSPACE:
 		case CTRL_KEY('h'):
@@ -847,11 +946,10 @@ void initEditor() {
 	ec.file_name = NULL;
 	ec.status_msg[0] = '\0';
 	ec.status_msg_time = 0;
-
-	if (getWindowSize(&ec.screen_rows, &ec.screen_cols) == -1)
-		die("Failed to get window size");
-
-	ec.screen_rows -= 2;
+	editorUpdateWindowSize();
+	// The SIGWINCH signal is sent to a process when its controlling 
+	// terminal changes its size (a window change).
+	signal(SIGWINCH, editorHandleSigwinch); 
 }
 
 int main(int argc, char* argv[]) {
@@ -860,7 +958,7 @@ int main(int argc, char* argv[]) {
 	if (argc >= 2)
 		editorOpen(argv[1]);
 
-	editorSetStatusMessage("Ctrl-Q to quit | Ctrl-S to save");
+	editorSetStatusMessage("Ctrl-Q to quit | Ctrl-S to save | Ctrl-F to search - ISO-8859-1 is recommended");
 
 	while (1) {
 		editorRefreshScreen();
