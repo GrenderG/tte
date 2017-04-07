@@ -555,6 +555,7 @@ void editorSave() {
 		}
 		close(fd);
 	}
+
 	free(buf);
 	editorSetStatusMessage("Cant's save file. Error occurred: %s", strerror(errno));
 }
@@ -562,20 +563,44 @@ void editorSave() {
 /*** Search section ***/
 
 void editorSearchCallback(char* query, int key) {
+	// Index of the row that the last match was on, -1 if there was
+	// no last match.
+	static int last_match = -1;
+	// 1 for searching forward and -1 for searching backwards.
+	static int direction = 1;
+
 	// Checking if the user pressed Enter or Escape, in which case 
 	// they are leaving search mode so we return immediately.
-	if (key == '\r' || key == '\x1b')
+	if (key == '\r' || key == '\x1b') {
+		last_match = -1;
+		direction = 1;
 		return;
+	} else if (key == ARROW_RIGHT || key == ARROW_DOWN) {
+		direction = 1;
+	} else if (key == ARROW_LEFT || key == ARROW_UP) {
+		direction = -1;
+	} else {
+		last_match = -1;
+		direction = 1;
+	}
 
+	int current = last_match;
 	int i;
 	for (i = 0; i < ec.num_rows; i++) {
-		editor_row* row = &ec.row[i];
+		current += direction;
+		if (current == -1)
+			current = ec.num_rows - 1;
+		else if (current == ec.num_rows)
+			current = 0;
+
+		editor_row* row = &ec.row[current];
 		// We use strstr to check if query is a substring of the
 		// current row. It returns NULL if there is no match,
 		// oterwhise it returns a pointer to the matching substring.
 		char* match = strstr(row -> render, query);
 		if (match) {
-			ec.cursor_y = i;
+			last_match = current;
+			ec.cursor_y = current;
 			ec.cursor_x = editorRowRenderXToCursorX(row, match - row -> render);
 			// We set this like so to scroll to the bottom of the file so
 			// that the next screen refresh will cause the matching line to
@@ -592,7 +617,7 @@ void editorSearch() {
 	int saved_col_offset = ec.col_offset;
 	int saved_row_offset = ec.row_offset;
 
-	char* query = editorPrompt("Search: %s (ESC to cancel)", editorSearchCallback);
+	char* query = editorPrompt("Search: %s (Use ESC / Enter / Arrows)", editorSearchCallback);
 
 	if (query) {
 		free(query);
@@ -842,7 +867,7 @@ char* editorPrompt(char* prompt, void (*callback)(char*, int)) {
 					callback(buf, c);
 				return buf;
 			}
-		} else if (!iscntrl(c)) {
+		} else if (!iscntrl(c) && isprint(c)) {
 			if (buf_len == buf_size - 1) {
 				buf_size *= 2;
 				buf = realloc(buf, buf_size);
