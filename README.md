@@ -31,8 +31,7 @@ Ctrl-F : Search text (ESC, arrows and enter to interact once searching)
 Ctrl-S : Save
 ```
 
-Current supported languages
----------------------------
+## Current supported languages
 * C (`*.c`, `*.h`)
 * C++ (`*.cpp`, `*.hpp`, `*.cc`)
 * Java (`*.java`)
@@ -40,3 +39,6 @@ Current supported languages
 * Python (`*.py`)
 * PHP (`*.php`)
 * JavaScript (`*.js`, `*.jsx`)
+
+## Images
+![First screenshot](https://raw.githubusercontent.com/GrenderG/tte/master/images/scr_1.png)
