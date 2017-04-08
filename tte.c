@@ -149,6 +149,7 @@ char* C_HL_extensions[] = {".c", ".h", ".cpp", NULL}; // Array must be terminate
 char* JAVA_HL_extensions[] = {".java", NULL};
 char* PYTHON_HL_extensions[] = {".py", NULL};
 char* BASH_HL_extensions[] = {".sh", NULL};
+char* JS_HL_extensions[] = {".js", ".jsx", NULL};
 
 char* C_HL_keywords[] = {
 	"switch", "if", "while", "for", "break", "continue", "return", "else",
@@ -177,7 +178,7 @@ char* PYTHON_HL_keywords[] = {
 	"else", "except", "exec", "finally", "for", "from", "global", "if", "import",
 	"in", "is", "lambda", "not", "or", "pass", "print", "raise", "return", "try",
 	"while", "with", "yield", 
-	
+
 	"buffer|", "bytearray|", "complex|", "False|", "float|", "frozenset|", "int|", 
 	"list|", "long|", "None|", "set|", "str|", "tuple|", "True|", "type|", 
 	"unicode|", "xrange|", NULL
@@ -191,6 +192,21 @@ char* BASH_HL_keywords[] = {
 	"history", "jobs", "kill", "let", "local", "logout", "popd", "pushd", "pwd", "read",
 	"readonly", "return", "set", "shift", "suspend", "test", "times", "trap", "type", 
 	"typeset", "ulimit", "umask", "unalias", "unset", "wait", "printf", NULL
+};
+
+char* JS_HL_keywords[] = {
+	"break", "case", "catch", "class", "const", "continue", "debugger", "default", 
+	"delete", "do", "else", "enum", "export", "extends", "finally", "for", "function", 
+	"if", "implements", "import", "in", "instanceof", "interface", "let", "new", 
+	"package", "private", "protected", "public", "return", "static", "super", "switch", 
+	"this", "throw", "try", "typeof", "var", "void", "while", "with", "yield", "true", 
+	"false", "null", "NaN", "global", "window", "prototype", "constructor", "document", 
+	"isNaN", "arguments", "undefined",
+
+	"Infinity|", "Array|", "Object|", "Number|", "String|", "Boolean|", "Function|", 
+	"ArrayBuffer|", "DataView|", "Float32Array|", "Float64Array|", "Int8Array|", 
+	"Int16Array|", "Int32Array|", "Uint8Array|", "Uint8ClampedArray|", "Uint32Array|", 
+	"Date|", "Error|", "Map|", "RegExp|", "Symbol|", "WeakMap|", "WeakSet|", "Set|", NULL
 };
 
 struct editor_syntax HL_DB[] = {
@@ -228,6 +244,15 @@ struct editor_syntax HL_DB[] = {
 		"#",
 		NULL,
 		NULL,
+		HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
+	},
+	{
+		"js",
+		JS_HL_extensions,
+		JS_HL_keywords,
+		"//",
+		"/*",
+		"*/",
 		HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
 	},
 };
