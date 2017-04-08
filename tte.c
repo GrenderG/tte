@@ -148,13 +148,16 @@ enum editor_highlight {
 char* C_HL_extensions[] = {".c", ".h", ".cpp", NULL}; // Array must be terminated with NULL.
 char* JAVA_HL_extensions[] = {".java", NULL};
 char* PYTHON_HL_extensions[] = {".py", NULL};
+char* BASH_HL_extensions[] = {".sh", NULL};
 
 char* C_HL_keywords[] = {
 	"switch", "if", "while", "for", "break", "continue", "return", "else",
 	"struct", "union", "typedef", "static", "enum", "class", "case", "#include",
-	"#define",
+	"volatile", "register", "sizeof", "typedef", "union", "goto", "const", "auto",
+	"#define", "#if", "#endif", "#error", "#ifdef", "#ifndef", "#undef"
+
 	"int|", "long|", "double|", "float|", "char|", "unsigned|", "signed|",
-	"void|", NULL
+	"void|", "bool|", NULL
 };
 
 char* JAVA_HL_keywords[] = {
@@ -164,6 +167,7 @@ char* JAVA_HL_keywords[] = {
 	"finally", "import", "instanceof", "interface", "new", "package", "super",
 	"native", "strictfp",
 	"synchronized", "this", "throw", "throws", "transient", "volatile",
+
 	"byte|", "char|", "double|", "float|", "int|", "long|", "short|",
 	"boolean|", NULL
 };
@@ -172,7 +176,21 @@ char* PYTHON_HL_keywords[] = {
 	"and", "as", "assert", "break", "class", "continue", "def", "del", "elif",
 	"else", "except", "exec", "finally", "for", "from", "global", "if", "import",
 	"in", "is", "lambda", "not", "or", "pass", "print", "raise", "return", "try",
-	"while", "with", "yield", NULL
+	"while", "with", "yield", 
+	
+	"buffer|", "bytearray|", "complex|", "False|", "float|", "frozenset|", "int|", 
+	"list|", "long|", "None|", "set|", "str|", "tuple|", "True|", "type|", 
+	"unicode|", "xrange|", NULL
+};
+
+char* BASH_HL_keywords[] = {
+	"case", "do", "done", "elif", "else", "esac", "fi", "for", "function", "if", 
+	"in", "select", "then", "time", "until", "while", "alias", "bg", "bind", "break",
+	"builtin", "cd", "command", "continue", "declare", "dirs", "disown", "echo",
+	"enable", "eval", "exec", "exit", "export", "fc", "fg", "getopts", "hash", "help",
+	"history", "jobs", "kill", "let", "local", "logout", "popd", "pushd", "pwd", "read",
+	"readonly", "return", "set", "shift", "suspend", "test", "times", "trap", "type", 
+	"typeset", "ulimit", "umask", "unalias", "unset", "wait", "printf", NULL
 };
 
 struct editor_syntax HL_DB[] = {
@@ -201,6 +219,15 @@ struct editor_syntax HL_DB[] = {
 		"#",
 		"'''",
 		"'''",
+		HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
+	},
+	{
+		"bash",
+		BASH_HL_extensions,
+		BASH_HL_keywords,
+		"#",
+		NULL,
+		NULL,
 		HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
 	},
 };
