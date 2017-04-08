@@ -145,11 +145,12 @@ enum editor_highlight {
 
 /*** Filetypes ***/
 
-char* C_HL_extensions[] = {".c", ".h", ".cpp", NULL}; // Array must be terminated with NULL.
+char* C_HL_extensions[] = {".c", ".h", ".cpp", ".hpp", ".cc", NULL}; // Array must be terminated with NULL.
 char* JAVA_HL_extensions[] = {".java", NULL};
 char* PYTHON_HL_extensions[] = {".py", NULL};
 char* BASH_HL_extensions[] = {".sh", NULL};
 char* JS_HL_extensions[] = {".js", ".jsx", NULL};
+char* PHP_HL_extensions[] = {".php", NULL};
 
 char* C_HL_keywords[] = {
 	"switch", "if", "while", "for", "break", "continue", "return", "else",
@@ -209,6 +210,17 @@ char* JS_HL_keywords[] = {
 	"Date|", "Error|", "Map|", "RegExp|", "Symbol|", "WeakMap|", "WeakSet|", "Set|", NULL
 };
 
+char* PHP_HL_keywords[] = {
+	"__halt_compiler", "break", "clone", "die", "empty", "endswitch", "final", "global",
+	"include_once", "list", "private", "return", "try", "xor", "abstract", "callable", 
+	"const", "do", "enddeclare", "endwhile", "finally", "goto", "instanceof", "namespace",
+	"protected", "static", "unset", "yield", "and", "case", "continue", "echo", "endfor",
+	"eval", "for", "if", "insteadof", "new", "public", "switch", "use", "array", "catch",
+	"declare", "else", "endforeach", "exit", "foreach", "implements", "interface", "or",
+	"require", "throw", "var", "as", "class", "default", "elseif", "endif", "extends",
+	"function", "include", "isset", "print", "require_once", "trait", "while", NULL
+};
+
 struct editor_syntax HL_DB[] = {
 	{
 		"c",
@@ -250,6 +262,15 @@ struct editor_syntax HL_DB[] = {
 		"js",
 		JS_HL_extensions,
 		JS_HL_keywords,
+		"//",
+		"/*",
+		"*/",
+		HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
+	},
+	{
+		"php",
+		PHP_HL_extensions,
+		PHP_HL_keywords,
 		"//",
 		"/*",
 		"*/",
