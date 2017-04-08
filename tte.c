@@ -146,11 +146,24 @@ enum editor_highlight {
 /*** Filetypes ***/
 
 char* C_HL_extensions[] = {".c", ".h", ".cpp", NULL}; // Array must be terminated with NULL.
-char *C_HL_keywords[] = {
+char* C_HL_keywords[] = {
   "switch", "if", "while", "for", "break", "continue", "return", "else",
-  "struct", "union", "typedef", "static", "enum", "class", "case",
+  "struct", "union", "typedef", "static", "enum", "class", "case", "#include",
+  "#define",
   "int|", "long|", "double|", "float|", "char|", "unsigned|", "signed|",
   "void|", NULL
+};
+
+char* JAVA_HL_extensions[] = {".java", NULL};
+char* JAVA_HL_keywords[] = {
+	"switch", "if", "while", "for", "break", "continue", "return", "else",
+	"in", "public", "private", "protected", "static", "final", "abstract",
+	"enum", "class", "case", "try", "catch", "do", "extends", "implements",
+	"finally", "import", "instanceof", "interface", "new", "package", "super",
+	"native", "strictfp",
+	"synchronized", "this", "throw", "throws", "transient", "volatile",
+	"byte|", "char|", "double|", "float|", "int|", "long|", "short|",
+	"boolean|", NULL
 };
 
 struct editor_syntax HL_DB[] = {
@@ -158,6 +171,15 @@ struct editor_syntax HL_DB[] = {
 		"c",
 		C_HL_extensions,
 		C_HL_keywords,
+		"//",
+		"/*",
+		"*/",
+		HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
+	},
+	{
+		"java",
+		JAVA_HL_extensions,
+		JAVA_HL_keywords,
 		"//",
 		"/*",
 		"*/",
@@ -335,6 +357,13 @@ void editorHandleSigwinch() {
 		ec.cursor_y = ec.screen_rows - 1;
 	if (ec.cursor_x > ec.screen_cols)
 		ec.cursor_x = ec.screen_cols - 1;
+	editorRefreshScreen();
+}
+
+void editorHandleSigcont() {
+	disableRawMode();
+	consoleBufferOpen();
+	enableRawMode();
 	editorRefreshScreen();
 }
 
@@ -530,15 +559,17 @@ void editorUpdateSyntax(editor_row* row) {
 
 int editorSyntaxToColor(int highlight) {
 	// We return ANSI codes for colors.
+	// See https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
+	// for a list of them.
 	switch (highlight) {
 		case HL_SL_COMMENT:
-		case HL_ML_COMMENT: return 36; // Cyan
-		case HL_KEYWORD_1: return 33; // Yellow
-		case HL_KEYWORD_2: return 32; // Green
-		case HL_STRING: return 35; // Magenta.
-		case HL_NUMBER: return 31; // Red.
-		case HL_MATCH: return 34; // Blue.
-		default: return 37; // White.
+		case HL_ML_COMMENT: return 36;
+		case HL_KEYWORD_1: return 31;
+		case HL_KEYWORD_2: return 32;
+		case HL_STRING: return 33;
+		case HL_NUMBER: return 35;
+		case HL_MATCH: return 34;
+		default: return 37;
 	}
 }
 
@@ -1052,7 +1083,7 @@ void editorDrawWelcomeMessage(struct a_buf* ab) {
 	// Using snprintf to truncate message in case the terminal
 	// is too tiny to handle the entire string.
 	int welcome_len = snprintf(welcome, sizeof(welcome),
-		"tte -- version %s", TTE_VERSION);
+		"tte %s <http://dmoral.es/>", TTE_VERSION);
 	if (welcome_len > ec.screen_cols)
 		welcome_len = ec.screen_cols;
 	// Centering the message.
@@ -1365,7 +1396,11 @@ void initEditor() {
 	editorUpdateWindowSize();
 	// The SIGWINCH signal is sent to a process when its controlling 
 	// terminal changes its size (a window change).
-	signal(SIGWINCH, editorHandleSigwinch); 
+	signal(SIGWINCH, editorHandleSigwinch);
+	// The SIGCONT signal instructs the operating system to continue 
+	// (restart) a process previously paused by the SIGSTOP or SIGTSTP 
+	// signal.
+	signal(SIGCONT, editorHandleSigcont);
 }
 
 int main(int argc, char* argv[]) {
