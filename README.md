@@ -4,6 +4,8 @@ tte (tiny text editor) is a terminal based text editor written in C from scratch
 
 This project was mainly created for educational purposes, so is very commented!
 
+Thanks to [antirez](http://antirez.com) for inspiring me with his project `kilo`.
+
 ## Installation
 
 ### Compiling
