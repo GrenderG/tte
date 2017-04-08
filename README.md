@@ -23,6 +23,7 @@ sudo sh -c "curl -LJO https://github.com/GrenderG/tte/releases/download/0.0.1/tt
 ```
 tte [file_name]
 ```
+If you are planning to use special characters like (á, é, í, ó, ú, ¡, ¿, ...) you must use `ISO 8859-1` encoding in your terminal. See [this issue](https://github.com/GrenderG/tte/issues/2) for more info.
 
 ## Keybindings
 ```
