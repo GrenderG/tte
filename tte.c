@@ -51,7 +51,7 @@
 // Version code
 #define TTE_VERSION "0.0.1"
 // Length of a tab stop
-#define TTE_TAB_STOP 8
+#define TTE_TAB_STOP 4
 // Times to press Ctrl-Q before exiting
 #define TTE_QUIT_TIMES 3
 // Highlight flags
@@ -146,15 +146,17 @@ enum editor_highlight {
 /*** Filetypes ***/
 
 char* C_HL_extensions[] = {".c", ".h", ".cpp", NULL}; // Array must be terminated with NULL.
+char* JAVA_HL_extensions[] = {".java", NULL};
+char* PYTHON_HL_extensions[] = {".py", NULL};
+
 char* C_HL_keywords[] = {
-  "switch", "if", "while", "for", "break", "continue", "return", "else",
-  "struct", "union", "typedef", "static", "enum", "class", "case", "#include",
-  "#define",
-  "int|", "long|", "double|", "float|", "char|", "unsigned|", "signed|",
-  "void|", NULL
+	"switch", "if", "while", "for", "break", "continue", "return", "else",
+	"struct", "union", "typedef", "static", "enum", "class", "case", "#include",
+	"#define",
+	"int|", "long|", "double|", "float|", "char|", "unsigned|", "signed|",
+	"void|", NULL
 };
 
-char* JAVA_HL_extensions[] = {".java", NULL};
 char* JAVA_HL_keywords[] = {
 	"switch", "if", "while", "for", "break", "continue", "return", "else",
 	"in", "public", "private", "protected", "static", "final", "abstract",
@@ -164,6 +166,13 @@ char* JAVA_HL_keywords[] = {
 	"synchronized", "this", "throw", "throws", "transient", "volatile",
 	"byte|", "char|", "double|", "float|", "int|", "long|", "short|",
 	"boolean|", NULL
+};
+
+char* PYTHON_HL_keywords[] = {
+	"and", "as", "assert", "break", "class", "continue", "def", "del", "elif",
+	"else", "except", "exec", "finally", "for", "from", "global", "if", "import",
+	"in", "is", "lambda", "not", "or", "pass", "print", "raise", "return", "try",
+	"while", "with", "yield", NULL
 };
 
 struct editor_syntax HL_DB[] = {
@@ -183,6 +192,15 @@ struct editor_syntax HL_DB[] = {
 		"//",
 		"/*",
 		"*/",
+		HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
+	},
+	{
+		"python",
+		PYTHON_HL_extensions,
+		PYTHON_HL_keywords,
+		"#",
+		"'''",
+		"'''",
 		HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
 	},
 };
