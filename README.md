@@ -16,11 +16,6 @@ make
 sudo cp tte /usr/local/bin/
 ```
 
-### One liner
-```
-sudo sh -c "curl -LJO https://github.com/GrenderG/tte/releases/download/0.0.1/tte -o /usr/local/bin/tte && chmod +x /usr/local/bin/tte"
-```
-
 ## Usage
 ```
 tte [file_name]
