@@ -1,3 +1,20 @@
+/* 
+*   Copyright (C) 2017 Daniel Morales
+*
+*   This program is free software: you can redistribute it and/or modify
+*   it under the terms of the GNU General Public License as published by
+*   the Free Software Foundation, either version 3 of the License, or
+*   (at your option) any later version.
+*
+*   This program is distributed in the hope that it will be useful,
+*   but WITHOUT ANY WARRANTY; without even the implied warranty of
+*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*   GNU General Public License for more details.
+*
+*   You should have received a copy of the GNU General Public License
+*   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 /*** Include section ***/
 
 // We add them above our includes, because the header 
@@ -796,7 +813,7 @@ void editorOpen(char* file_name) {
 
 	editorSelectSyntaxHighlight();
 
-	FILE* file = fopen(file_name, "r");
+	FILE* file = fopen(file_name, "a+");
 	if (!file)
 		die("Failed to open the file");
 
@@ -996,13 +1013,9 @@ void editorDrawStatusBar(struct a_buf* ab) {
 
 	char status[80], r_status[80];
 	// Showing up to 20 characters of the filename, followed by the number of lines.
-	int len = snprintf(status, sizeof(status), "Editing: %.20s %s", ec.file_name ? ec.file_name : "New file", ec.dirty ? "(modified)" : "");
-	int col_size;
-	if (ec.row && ec.cursor_y <= ec.num_rows - 1)
-		col_size = ec.row[ec.cursor_y].size;
-	else
-		col_size = 0;
-	int r_len = snprintf(r_status, sizeof(r_status), "%d/%d lines  %d/%d cols", ec.cursor_y + 1 > ec.num_rows ? ec.num_rows : ec.cursor_y + 1, ec.num_rows,
+	int len = snprintf(status, sizeof(status), " Editing: %.20s %s", ec.file_name ? ec.file_name : "New file", ec.dirty ? "(modified)" : "");
+	int col_size = ec.row && ec.cursor_y <= ec.num_rows - 1 ? col_size = ec.row[ec.cursor_y].size : 0;
+	int r_len = snprintf(r_status, sizeof(r_status), "%d/%d lines  %d/%d cols ", ec.cursor_y + 1 > ec.num_rows ? ec.num_rows : ec.cursor_y + 1, ec.num_rows,
 		ec.cursor_x + 1 > col_size ? col_size : ec.cursor_x + 1, col_size);
 	if (len > ec.screen_cols)
 		len = ec.screen_cols;
@@ -1361,7 +1374,7 @@ int main(int argc, char* argv[]) {
 	if (argc >= 2)
 		editorOpen(argv[1]);
 
-	editorSetStatusMessage("Ctrl-Q to quit | Ctrl-S to save | Ctrl-F to search - ISO-8859-1 is recommended");
+	editorSetStatusMessage(" Ctrl-Q to quit | Ctrl-S to save | Ctrl-F to search - ISO-8859-1 is recommended");
 
 	while (1) {
 		editorRefreshScreen();
