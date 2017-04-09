@@ -62,10 +62,10 @@
 
 typedef struct editor_row {
     int idx; // Row own index within the file.
-    int size;
-    int render_size;
-    char* chars;
-    char* render;
+    int size; // Size of the content (excluding NULL term)
+    int render_size; // Size of the rendered content
+    char* chars; // Row content
+    char* render; // Row content "rendered" for screen (for TABs).
     unsigned char* highlight; // This will tell you if a character is part of a string, comment, number...
     int hl_open_comment; // True if the line is part of a ML comment.
 } editor_row;
@@ -97,11 +97,11 @@ struct editor_config {
     int cursor_x;
     int cursor_y;
     int render_x;
-    int row_offset;
-    int col_offset;
-    int screen_rows;
-    int screen_cols;
-    int num_rows;
+    int row_offset; // Offset of row displayed.
+    int col_offset; // Offset of col displayed.
+    int screen_rows; // Number of rows that we can show
+    int screen_cols; // Number of cols that we can show
+    int num_rows; // Number of rows
     editor_row* row;
     int dirty; // To know if a file has been modified since opening.
     char* file_name;
