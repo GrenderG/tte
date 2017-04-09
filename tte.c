@@ -1,4 +1,4 @@
-/* 
+/*
 *   Copyright (C) 2017 Daniel Morales
 *
 *   This program is free software: you can redistribute it and/or modify
@@ -49,7 +49,7 @@
 // Empty buffer
 #define ABUF_INIT {NULL, 0}
 // Version code
-#define TTE_VERSION "0.0.1"
+#define TTE_VERSION "0.0.2"
 // Length of a tab stop
 #define TTE_TAB_STOP 4
 // Times to press Ctrl-Q before exiting
@@ -865,15 +865,6 @@ void editorFreeRow(editor_row* row) {
     free(row -> highlight);
 }
 
-// -1 down, 1 up
-void editorFlipRow(int dir) {
-    editor_row c_row = ec.row[ec.cursor_y];
-    ec.row[ec.cursor_y] = ec.row[ec.cursor_y - dir];
-    ec.row[ec.cursor_y - dir] = c_row;
-    ec.cursor_y -= dir;
-    ec.dirty++;
-}
-
 void editorDelRow(int at) {
     if (at < 0 || at >= ec.num_rows)
         return;
@@ -885,6 +876,24 @@ void editorDelRow(int at) {
     }
 
     ec.num_rows--;
+    ec.dirty++;
+}
+
+// -1 down, 1 up
+void editorFlipRow(int dir) {
+    editor_row c_row = ec.row[ec.cursor_y];
+    ec.row[ec.cursor_y] = ec.row[ec.cursor_y - dir];
+    ec.row[ec.cursor_y - dir] = c_row;
+
+    ec.row[ec.cursor_y].idx += dir;
+    ec.row[ec.cursor_y - dir].idx -= dir;
+
+    int first = (dir == 1) ? ec.cursor_y - 1 : ec.cursor_y;
+    editorUpdateSyntax(&ec.row[first]);
+    editorUpdateSyntax(&ec.row[first] + 1);
+    editorUpdateSyntax(&ec.row[first] + 2);
+
+    ec.cursor_y -= dir;
     ec.dirty++;
 }
 
