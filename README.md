@@ -4,7 +4,7 @@ tte (tiny text editor) is a terminal based text editor written in C from scratch
 
 This project was mainly created for educational purposes, so is very commented!
 
-Thanks to [antirez](http://antirez.com) for inspiring me with his project `kilo`.
+Thanks to [antirez](http://antirez.com) for inspiring me with his project `kilo` and [Jeremy Ruten](https://twitter.com/yjerem) for his tutorials.
 
 ## Installation
 
@@ -16,7 +16,7 @@ make
 sudo cp tte /usr/local/bin/
 ```
 ### Download executable
-Download it from [here](https://github.com/GrenderG/tte/releases/download/0.0.1/tte), then
+Download it from [here](https://github.com/GrenderG/tte/releases/download/0.0.2/tte), then
 ```
 sudo mv tte /usr/local/bin/
 sudo chmod +x /usr/local/bin/tte
