@@ -15,7 +15,7 @@ cd tte/
 make
 sudo cp tte /usr/local/bin/
 ```
-# Download executable
+### Download executable
 Download it from [here](https://github.com/GrenderG/tte/releases/download/0.0.1/tte), then
 ```
 sudo mv tte /usr/local/bin/
