@@ -1600,7 +1600,7 @@ int main(int argc, char* argv[]) {
         return 0;
     enableRawMode();
 
-    editorSetStatusMessage(" Ctrl-Q to quit | Ctrl-S to save | (tte -h | --h for more info)");
+    editorSetStatusMessage(" Ctrl-Q to quit | Ctrl-S to save | (tte -h | --help for more info)");
 
     while (1) {
         editorRefreshScreen();
