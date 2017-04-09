@@ -1,6 +1,6 @@
 # tte
 
-tte (tiny text editor) is a terminal based text editor written in C from scratch, trying to be very minimalistic and dependency independent. 
+tte (tiny text editor) is a terminal based text editor written in C from scratch, trying to be very minimalistic and dependency independent (it's not even using **curses**). 
 
 This project was mainly created for educational purposes, so is very commented!
 
