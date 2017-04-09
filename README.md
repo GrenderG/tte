@@ -19,6 +19,8 @@ sudo cp tte /usr/local/bin/
 ## Usage
 ```
 tte [file_name]
+tte -h | --help
+tte -v | --version
 ```
 If you are planning to use special characters like (á, é, í, ó, ú, ¡, ¿, ...) you must use `ISO 8859-1` encoding in your terminal. See [this issue](https://github.com/GrenderG/tte/issues/2) for more info.
 
@@ -37,6 +39,9 @@ Ctrl-S : Save
 * Python (`*.py`)
 * PHP (`*.php`)
 * JavaScript (`*.js`, `*.jsx`)
+* JSON (`*.json`, `*.jsonp`)
+* XML (partially) (`*.xml`)
+* SQL (`*.sql`)
 
 ## Images
 ![First screenshot](https://raw.githubusercontent.com/GrenderG/tte/master/images/scr_1.png)
