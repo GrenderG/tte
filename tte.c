@@ -152,6 +152,7 @@ char* BASH_HL_extensions[] = {".sh", NULL};
 char* JS_HL_extensions[] = {".js", ".jsx", NULL};
 char* PHP_HL_extensions[] = {".php", NULL};
 char* JSON_HL_extensions[] = {".json", ".jsonp", NULL};
+char* XML_HL_extensions[] = {".xml", NULL};
 
 char* C_HL_keywords[] = {
     "switch", "if", "while", "for", "break", "continue", "return", "else",
@@ -226,6 +227,10 @@ char* JSON_HL_keywords[] = {
 	NULL
 };
 
+char* XML_HL_keywords[] = {
+	NULL
+};
+
 struct editor_syntax HL_DB[] = {
     {
         "c",
@@ -285,6 +290,15 @@ struct editor_syntax HL_DB[] = {
         "json",
         JSON_HL_extensions,
         JSON_HL_keywords,
+        NULL,
+        NULL,
+        NULL,
+        HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
+    },
+    {
+        "xml",
+        XML_HL_extensions,
+        XML_HL_keywords,
         NULL,
         NULL,
         NULL,
