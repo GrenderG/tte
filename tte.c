@@ -1570,6 +1570,8 @@ void printHelp() {
     printf("Option        \t\tAction\n\n");
     printf("-h | --help   \t\tPrints the help\n");
     printf("-v | --version\t\tPrints the version of tte\n");
+
+    printf("\n\nFor now, usage of ISO 8859-1 is recommended.\n");
 }
 
 // 1 if editor should open, 0 otherwise
@@ -1598,7 +1600,7 @@ int main(int argc, char* argv[]) {
         return 0;
     enableRawMode();
 
-    editorSetStatusMessage(" Ctrl-Q to quit | Ctrl-S to save | Ctrl-F to search - ISO-8859-1 is recommended");
+    editorSetStatusMessage(" Ctrl-Q to quit | Ctrl-S to save | (tte -h | --h for more info)");
 
     while (1) {
         editorRefreshScreen();
