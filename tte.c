@@ -1574,7 +1574,7 @@ void printHelp() {
     printf("\n\nFor now, usage of ISO 8859-1 is recommended.\n");
 }
 
-// 1 if editor should open, 0 otherwise
+// 1 if editor should open, 0 otherwise, -1 if the program should exit
 int handleArgs(int argc, char* argv[]) {
     if (argc == 1)
         return 0;
@@ -1582,10 +1582,10 @@ int handleArgs(int argc, char* argv[]) {
     if (argc >= 2) {
         if (strncmp("-h", argv[1], 2) == 0 || strncmp("--help", argv[1], 6) == 0) {
             printHelp();
-            return 0;
+            return -1;
         } else if(strncmp("-v", argv[1], 2) == 0 || strncmp("--version", argv[1], 9) == 0) {
             printf("tte - version %s\n", TTE_VERSION);
-            return 0;
+            return -1;
         }
     }
 
@@ -1594,9 +1594,10 @@ int handleArgs(int argc, char* argv[]) {
 
 int main(int argc, char* argv[]) {
     initEditor();
-    if (handleArgs(argc, argv))
+    int arg_response = handleArgs(argc, argv);
+    if (arg_response == 1)
         editorOpen(argv[1]);
-    else
+    else if (arg_response == -1)
         return 0;
     enableRawMode();
 
