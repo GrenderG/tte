@@ -35,6 +35,8 @@ If you are planning to use special characters like (á, é, í, ó, ú, ¡, ¿, 
 Ctrl-Q : Exit
 Ctrl-F : Search text (ESC, arrows and enter to interact once searching)
 Ctrl-S : Save
+Ctrl-E : Flip line upwards
+Ctrl-D : Flip line downwards
 ```
 
 ## Current supported languages

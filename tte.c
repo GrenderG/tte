@@ -865,6 +865,15 @@ void editorFreeRow(editor_row* row) {
     free(row -> highlight);
 }
 
+// -1 down, 1 up
+void editorFlipRow(int dir) {
+    editor_row c_row = ec.row[ec.cursor_y];
+    ec.row[ec.cursor_y] = ec.row[ec.cursor_y - dir];
+    ec.row[ec.cursor_y - dir] = c_row;
+    ec.cursor_y -= dir;
+    ec.dirty++;
+}
+
 void editorDelRow(int at) {
     if (at < 0 || at >= ec.num_rows)
         return;
@@ -1485,6 +1494,14 @@ void editorProcessKeypress() {
         case CTRL_KEY('s'):
             editorSave();
             break;
+        case CTRL_KEY('e'):
+            if (ec.cursor_y > 0)
+                editorFlipRow(1);
+            break;
+        case CTRL_KEY('d'):
+            if (ec.cursor_y < ec.num_rows - 1)
+                editorFlipRow(-1);
+        	break;
         case ARROW_UP:
         case ARROW_DOWN:
         case ARROW_LEFT:
@@ -1564,7 +1581,9 @@ void printHelp() {
     printf("Keybinding\t\tAction\n\n");
     printf("Ctrl-Q    \t\tExit\n");
     printf("Ctrl-S    \t\tSave\n");
-    printf("Ctrl-F    \t\tSearch (Esc, enter and arrows to interact once searching)\n");
+    printf("Ctrl-F    \t\tSearch. Esc, enter and arrows to interact once searching\n");
+    printf("Ctrl-E    \t\tFlip line upwards\n");
+    printf("Ctrl-D    \t\tFlip line downwards\n");
 
     printf("\n\nOPTIONS\n-------\n\n");
     printf("Option        \t\tAction\n\n");
