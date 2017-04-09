@@ -53,7 +53,7 @@
 // Length of a tab stop
 #define TTE_TAB_STOP 4
 // Times to press Ctrl-Q before exiting
-#define TTE_QUIT_TIMES 3
+#define TTE_QUIT_TIMES 1
 // Highlight flags
 #define HL_HIGHLIGHT_NUMBERS (1 << 0)
 #define HL_HIGHLIGHT_STRINGS (1 << 1)
@@ -891,7 +891,7 @@ void editorFlipRow(int dir) {
     int first = (dir == 1) ? ec.cursor_y - 1 : ec.cursor_y;
     editorUpdateSyntax(&ec.row[first]);
     editorUpdateSyntax(&ec.row[first] + 1);
-    editorUpdateSyntax(&ec.row[first] + 2);
+    //editorUpdateSyntax(&ec.row[first] + 2);
 
     ec.cursor_y -= dir;
     ec.dirty++;
@@ -1492,7 +1492,7 @@ void editorProcessKeypress() {
             break;
         case CTRL_KEY('q'):
             if (ec.dirty && quit_times > 0) {
-                editorSetStatusMessage("Warning! File has unsaved changes. Press Ctrl-Q %d more times to quit", quit_times);
+                editorSetStatusMessage("Warning! File has unsaved changes. Press Ctrl-Q again to quit");
                 quit_times--;
                 return;
             }
@@ -1504,7 +1504,7 @@ void editorProcessKeypress() {
             editorSave();
             break;
         case CTRL_KEY('e'):
-            if (ec.cursor_y > 0)
+            if (ec.cursor_y > 0 && ec.cursor_y <= ec.num_rows - 1)
                 editorFlipRow(1);
             break;
         case CTRL_KEY('d'):
