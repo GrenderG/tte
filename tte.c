@@ -1494,11 +1494,45 @@ void initEditor() {
 	signal(SIGCONT, editorHandleSigcont);
 }
 
+void printHelp() {
+	printf("Usage: tte [OPTIONS] [FILE]\n\n");
+	printf("\nKEYBINDINGS\n-----------\n\n");
+	printf("Keybinding\t\tAction\n\n");
+	printf("Ctrl-Q    \t\tExit\n");
+	printf("Ctrl-S    \t\tSave\n");
+	printf("Ctrl-F    \t\tSearch (Esc, enter and arrows to interact once searching)\n");
+
+	printf("\n\nOPTIONS\n-------\n\n");
+	printf("Option        \t\tAction\n\n");
+	printf("-h | --help   \t\tPrints the help\n");
+	printf("-v | --version\t\tPrints the version of tte\n");
+}
+
+// 1 if editor should open, 0 otherwise
+int handleArgs(int argc, char* argv[]) {
+	if (argc == 1)
+		return 0;
+
+	if (argc >= 2) {
+		if (strncmp("-h", argv[1], 2) == 0 || strncmp("--help", argv[1], 6) == 0) {
+			printHelp();
+			return 0;
+		} else if(strncmp("-v", argv[1], 2) == 0 || strncmp("--version", argv[1], 9) == 0) {
+			printf("tte - version %s\n", TTE_VERSION);
+			return 0;
+		}
+	}
+
+	return 1;
+}
+
 int main(int argc, char* argv[]) {
-	enableRawMode();
 	initEditor();
-	if (argc >= 2)
+	if (handleArgs(argc, argv))
 		editorOpen(argv[1]);
+	else
+		return 0;
+	enableRawMode();
 
 	editorSetStatusMessage(" Ctrl-Q to quit | Ctrl-S to save | Ctrl-F to search - ISO-8859-1 is recommended");
 
