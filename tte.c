@@ -153,6 +153,7 @@ char* JS_HL_extensions[] = {".js", ".jsx", NULL};
 char* PHP_HL_extensions[] = {".php", NULL};
 char* JSON_HL_extensions[] = {".json", ".jsonp", NULL};
 char* XML_HL_extensions[] = {".xml", NULL};
+char* SQL_HL_extensions[] = {".sql", NULL};
 
 char* C_HL_keywords[] = {
     "switch", "if", "while", "for", "break", "continue", "return", "else",
@@ -231,6 +232,32 @@ char* XML_HL_keywords[] = {
 	NULL
 };
 
+char* SQL_HL_keywords[] = {
+	"SELECT", "FROM", "DROP", "CREATE", "TABLE", "DEFAULT", "FOREIGN", "UPDATE", "LOCK",
+	"INSERT", "INTO", "VALUES", "LOCK", "UNLOCK", "WHERE", "DINSTINCT", "BETWEEN", "NOT",
+	"NULL", "TO", "ON", "ORDER", "GROUP", "IF", "BY", "HAVING", "USING", "UNION", "UNIQUE",
+	"AUTO_INCREMENT", "LIKE", "WITH", "INNER", "OUTER", "JOIN", "COLUMN", "DATABASE", "EXISTS",
+	"NATURAL", "LIMIT", "UNSIGNED", "MAX", "MIN", "PRECISION", "ALTER", "DELETE", "CASCADE",
+	"PRIMARY", "KEY", "CONSTRAINT", "ENGINE", "CHARSET", "REFERENCES", "WRITE",
+
+	"BIT|", "TINYINT|", "BOOL|", "BOOLEAN|", "SMALLINT|", "MEDIUMINT|", "INT|", "INTEGER|",
+	"BIGINT|", "DOUBLE|", "DECIMAL|", "DEC|" "FLOAT|", "DATE|", "DATETIME|", "TIMESTAMP|",
+	"TIME|", "YEAR|", "CHAR|", "VARCHAR|", "TEXT|", "ENUM|", "SET|", "BLOB|", "VARBINARY|",
+	"TINYBLOB|", "TINYTEXT|", "MEDIUMBLOB|", "MEDIUMTEXT|", "LONGTEXT|",
+
+	"select", "from", "drop", "create", "table", "default", "foreign", "update", "lock",
+	"insert", "into", "values", "lock", "unlock", "where", "dinstinct", "between", "not",
+	"null", "to", "on", "order", "group", "if", "by", "having", "using", "union", "unique",
+	"auto_increment", "like", "with", "inner", "outer", "join", "column", "database", "exists",
+	"natural", "limit", "unsigned", "max", "min", "precision", "alter", "delete", "cascade",
+	"primary", "key", "constraint", "engine", "charset", "references", "write",
+
+	"bit|", "tinyint|", "bool|", "boolean|", "smallint|", "mediumint|", "int|", "integer|",
+	"bigint|", "double|", "decimal|", "dec|" "float|", "date|", "datetime|", "timestamp|",
+	"time|", "year|", "char|", "varchar|", "text|", "enum|", "set|", "blob|", "varbinary|",
+	"tinyblob|", "tinytext|", "mediumblob|", "mediumtext|", "longtext|", NULL
+};
+
 struct editor_syntax HL_DB[] = {
     {
         "c",
@@ -302,6 +329,15 @@ struct editor_syntax HL_DB[] = {
         NULL,
         NULL,
         NULL,
+        HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
+    },
+    {
+        "sql",
+        SQL_HL_extensions,
+        SQL_HL_keywords,
+        "--",
+        "/*",
+        "*/",
         HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
     },
 };
