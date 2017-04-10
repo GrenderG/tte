@@ -49,7 +49,7 @@
 // Empty buffer
 #define ABUF_INIT {NULL, 0}
 // Version code
-#define TTE_VERSION "0.0.2"
+#define TTE_VERSION "0.0.3"
 // Length of a tab stop
 #define TTE_TAB_STOP 4
 // Times to press Ctrl-Q before exiting
@@ -107,6 +107,7 @@ struct editor_config {
     char* file_name;
     char status_msg[80];
     time_t status_msg_time;
+	char* copied_char_buffer;
     struct editor_syntax* syntax;
     struct termios orig_termios;
 } ec;
@@ -360,6 +361,10 @@ void abufFree();
 void abufAppend();
 
 char *editorPrompt(char* prompt, void (*callback)(char*, int));
+
+void editorRowAppendString(editor_row* row, char* s, size_t len);
+
+void editorInsertNewline();
 
 /*** Terminal section ***/
 
@@ -896,6 +901,28 @@ void editorFlipRow(int dir) {
 
     ec.cursor_y -= dir;
     ec.dirty++;
+}
+
+void editorCopy(int cut) {
+	ec.copied_char_buffer = realloc(ec.copied_char_buffer, strlen(ec.row[ec.cursor_y].chars) + 1);
+	strcpy(ec.copied_char_buffer, ec.row[ec.cursor_y].chars);
+	editorSetStatusMessage(cut ? "Content cutted" : "Content copied");
+}
+
+void editorCut() {
+	editorCopy(-1);
+	editorDelRow(ec.cursor_y);
+}
+
+void editorPaste() {
+	if (ec.copied_char_buffer == NULL)
+		return;
+	
+	if (ec.cursor_y == ec.num_rows)
+		editorInsertRow(ec.cursor_y, ec.copied_char_buffer, strlen(ec.copied_char_buffer));
+	else
+		editorRowAppendString(&ec.row[ec.cursor_y], ec.copied_char_buffer, strlen(ec.copied_char_buffer));
+	ec.cursor_x += strlen(ec.copied_char_buffer);
 }
 
 void editorRowInsertChar(editor_row* row, int at, int c) {
@@ -1512,6 +1539,17 @@ void editorProcessKeypress() {
             if (ec.cursor_y < ec.num_rows - 1)
                 editorFlipRow(-1);
         	break;
+		case CTRL_KEY('x'):
+			if (ec.cursor_y < ec.num_rows)
+				editorCut();
+			break;
+		case CTRL_KEY('c'):
+			if (ec.cursor_y < ec.num_rows)
+				editorCopy(0);
+			break;
+		case CTRL_KEY('v'):
+			editorPaste();
+			break;
         case ARROW_UP:
         case ARROW_DOWN:
         case ARROW_LEFT:
@@ -1573,6 +1611,7 @@ void initEditor() {
     ec.file_name = NULL;
     ec.status_msg[0] = '\0';
     ec.status_msg_time = 0;
+	ec.copied_char_buffer = NULL;
     ec.syntax = NULL;
 
     editorUpdateWindowSize();
@@ -1594,6 +1633,9 @@ void printHelp() {
     printf("Ctrl-F    \t\tSearch. Esc, enter and arrows to interact once searching\n");
     printf("Ctrl-E    \t\tFlip line upwards\n");
     printf("Ctrl-D    \t\tFlip line downwards\n");
+    printf("Ctrl-C    \t\tCopy line\n");
+    printf("Ctrl-X    \t\tCut line\n");
+    printf("Ctrl-V    \t\tPaste line\n");
 
     printf("\n\nOPTIONS\n-------\n\n");
     printf("Option        \t\tAction\n\n");
