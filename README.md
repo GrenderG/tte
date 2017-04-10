@@ -16,7 +16,7 @@ make
 sudo cp tte /usr/local/bin/
 ```
 ### Download executable
-Download it from [here](https://github.com/GrenderG/tte/releases/download/0.0.2/tte), then
+Download it from [here](https://github.com/GrenderG/tte/releases/latest), then
 ```
 sudo mv tte /usr/local/bin/
 sudo chmod +x /usr/local/bin/tte
