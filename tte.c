@@ -1551,6 +1551,9 @@ void editorProcessKeypress() {
 		case CTRL_KEY('v'):
 			editorPaste();
 			break;
+		case CTRL_KEY('w'):
+			consoleBufferClose();
+			kill(0, SIGTSTP); 
         case ARROW_UP:
         case ARROW_DOWN:
         case ARROW_LEFT:
