@@ -891,7 +891,8 @@ void editorFlipRow(int dir) {
     int first = (dir == 1) ? ec.cursor_y - 1 : ec.cursor_y;
     editorUpdateSyntax(&ec.row[first]);
     editorUpdateSyntax(&ec.row[first] + 1);
-    editorUpdateSyntax(&ec.row[first] + 2);
+	if (ec.num_rows - ec.cursor_y - 1 > 2) 
+	    editorUpdateSyntax(&ec.row[first] + 2);
 
     ec.cursor_y -= dir;
     ec.dirty++;
