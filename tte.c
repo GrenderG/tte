@@ -1640,6 +1640,7 @@ void printHelp() {
     printf("Ctrl-C    \t\tCopy line\n");
     printf("Ctrl-X    \t\tCut line\n");
     printf("Ctrl-V    \t\tPaste line\n");
+    printf("Ctrl-W    \t\tPause tte (type \"fg\" to resume\n");
 
     printf("\n\nOPTIONS\n-------\n\n");
     printf("Option        \t\tAction\n\n");
