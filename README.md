@@ -37,6 +37,9 @@ Ctrl-F : Search text (ESC, arrows and enter to interact once searching)
 Ctrl-S : Save
 Ctrl-E : Flip line upwards
 Ctrl-D : Flip line downwards
+Ctrl-C : Copy line
+Ctrl-X : Cut line
+Ctrl-V : Paste line
 ```
 
 ## Current supported languages
