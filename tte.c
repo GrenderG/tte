@@ -1525,7 +1525,7 @@ void editorProcessKeypress() {
             break;
         case CTRL_KEY('q'):
             if (ec.dirty && quit_times > 0) {
-                editorSetStatusMessage("Warning! File has unsaved changes. Press Ctrl-Q %d more time to quit", quit_times);
+                editorSetStatusMessage("Warning! File has unsaved changes. Press Ctrl-Q %d more time%s to quit", quit_times, quit_times > 1 ? "s" : "");
                 quit_times--;
                 return;
             }
