@@ -912,6 +912,10 @@ void editorCopy(int cut) {
 void editorCut() {
 	editorCopy(-1);
 	editorDelRow(ec.cursor_y);
+	if (ec.num_rows - ec.cursor_y > 0)
+		editorUpdateSyntax(&ec.row[ec.cursor_y]);
+	if (ec.num_rows - ec.cursor_y > 1)
+		editorUpdateSyntax(&ec.row[ec.cursor_y + 1]);
 	ec.cursor_x = ec.row[ec.cursor_y].size - (ec.cursor_y == ec.num_rows);
 }
 
