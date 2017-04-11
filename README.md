@@ -53,6 +53,7 @@ Ctrl-P : Pause tte (type "fg" to resume)
 * JSON (`*.json`, `*.jsonp`)
 * XML (partially) (`*.xml`)
 * SQL (`*.sql`)
+* Ruby (`*.rb`)
 
 ## Images
 ![First screenshot](https://raw.githubusercontent.com/GrenderG/tte/master/images/scr_1.png)
