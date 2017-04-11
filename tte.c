@@ -916,7 +916,7 @@ void editorCut() {
 		editorUpdateSyntax(&ec.row[ec.cursor_y]);
 	if (ec.num_rows - ec.cursor_y > 1)
 		editorUpdateSyntax(&ec.row[ec.cursor_y + 1]);
-	ec.cursor_x = ec.row[ec.cursor_y].size - (ec.cursor_y == ec.num_rows);
+	ec.cursor_x = ec.cursor_y == ec.num_rows ? 0 : ec.row[ec.cursor_y].size;
 }
 
 void editorPaste() {
