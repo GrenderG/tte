@@ -30,6 +30,7 @@ tte -v | --version
 If you are planning to use special characters like (á, é, í, ó, ú, ¡, ¿, ...) you must use `ISO 8859-1` encoding in your terminal. See [this issue](https://github.com/GrenderG/tte/issues/2) for more info.
 
 ## Keybindings
+The key combinations chosen here are the ones that fit the best for me.
 ```
 Ctrl-Q : Exit
 Ctrl-F : Search text (ESC, arrows and enter to interact once searching)
