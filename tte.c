@@ -1555,7 +1555,7 @@ void editorProcessKeypress() {
 		case CTRL_KEY('v'):
 			editorPaste();
 			break;
-		case CTRL_KEY('w'):
+		case CTRL_KEY('p'):
 			consoleBufferClose();
 			kill(0, SIGTSTP); 
         case ARROW_UP:
@@ -1644,7 +1644,7 @@ void printHelp() {
     printf("Ctrl-C    \t\tCopy line\n");
     printf("Ctrl-X    \t\tCut line\n");
     printf("Ctrl-V    \t\tPaste line\n");
-    printf("Ctrl-W    \t\tPause tte (type \"fg\" to resume)\n");
+    printf("Ctrl-P    \t\tPause tte (type \"fg\" to resume)\n");
 
     printf("\n\nOPTIONS\n-------\n\n");
     printf("Option        \t\tAction\n\n");
