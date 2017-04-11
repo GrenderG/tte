@@ -49,7 +49,7 @@
 // Empty buffer
 #define ABUF_INIT {NULL, 0}
 // Version code
-#define TTE_VERSION "0.0.3"
+#define TTE_VERSION "0.0.4"
 // Length of a tab stop
 #define TTE_TAB_STOP 4
 // Times to press Ctrl-Q before exiting
@@ -155,6 +155,7 @@ char* PHP_HL_extensions[] = {".php", NULL};
 char* JSON_HL_extensions[] = {".json", ".jsonp", NULL};
 char* XML_HL_extensions[] = {".xml", NULL};
 char* SQL_HL_extensions[] = {".sql", NULL};
+char* RUBY_HL_extensions[] = {".rb", NULL};
 
 char* C_HL_keywords[] = {
     "switch", "if", "while", "for", "break", "continue", "return", "else",
@@ -259,6 +260,13 @@ char* SQL_HL_keywords[] = {
 	"tinyblob|", "tinytext|", "mediumblob|", "mediumtext|", "longtext|", NULL
 };
 
+char* RUBY_HL_keywords[] = {
+	"__ENCODING__", "__LINE__", "__FILE__", "BEGIN", "END", "alias", "and", "begin", "break",
+	"case", "class", "def", "defined?", "do", "else", "elsif", "end", "ensure", "for", "if",
+	"in", "module", "next", "not", "or", "redo", "rescue", "retry", "return", "self", "super",
+	"then", "undef", "unless", "until", "when", "while", "yield", NULL
+};
+
 struct editor_syntax HL_DB[] = {
     {
         "c",
@@ -341,6 +349,15 @@ struct editor_syntax HL_DB[] = {
         "*/",
         HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
     },
+	{
+		"ruby",
+		RUBY_HL_extensions,
+		RUBY_HL_keywords,
+		"#",
+		"=begin",
+		"=end",
+        HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
+	}
 };
 
 // Size of the "Hightlight Database" (HL_DB).
