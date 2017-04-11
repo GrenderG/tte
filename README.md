@@ -12,8 +12,7 @@ Thanks to [antirez](http://antirez.com) for inspiring me with his project `kilo`
 ```
 git clone https://github.com/GrenderG/tte.git
 cd tte/
-make
-sudo cp tte /usr/local/bin/
+make install
 ```
 ### Download executable
 Download it from [here](https://github.com/GrenderG/tte/releases/latest), then
