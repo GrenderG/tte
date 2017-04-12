@@ -349,15 +349,15 @@ struct editor_syntax HL_DB[] = {
         "*/",
         HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
     },
-	{
-		"ruby",
-		RUBY_HL_extensions,
-		RUBY_HL_keywords,
-		"#",
-		"=begin",
-		"=end",
+    {
+        "ruby",
+        RUBY_HL_extensions,
+        RUBY_HL_keywords,
+        "#",
+        "=begin",
+        "=end",
         HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
-	}
+    }
 };
 
 // Size of the "Hightlight Database" (HL_DB).
