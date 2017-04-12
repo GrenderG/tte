@@ -14,7 +14,7 @@ git clone https://github.com/GrenderG/tte.git
 cd tte/
 make install
 ```
-### Download executable
+### Downloading executable
 Download it from [here](https://github.com/GrenderG/tte/releases/latest), then
 ```
 sudo mv tte /usr/local/bin/
