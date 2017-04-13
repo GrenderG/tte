@@ -17,8 +17,8 @@
 
 /*** Include section ***/
 
-// We add them above our includes, because the header 
-// files we are including use the macros to decide what 
+// We add them above our includes, because the header
+// files we are including use the macros to decide what
 // features to expose. These macros remove some compilation
 // warnings. See
 // https://www.gnu.org/software/libc/manual/html_node/Feature-Test-Macros.html
@@ -71,22 +71,22 @@ typedef struct editor_row {
 } editor_row;
 
 struct editor_syntax {
-    // file_type field is the name of the filetype that will be displayed 
+    // file_type field is the name of the filetype that will be displayed
     // to the user in the status bar.
     char* file_type;
-    // file_match is an array of strings, where each string contains a 
-    // pattern to match a filename against. If the filename matches, 
+    // file_match is an array of strings, where each string contains a
+    // pattern to match a filename against. If the filename matches,
     // then the file will be recognized as having that filetype.
     char** file_match;
-    // This will be a NULL-terminated array of strings, each string containing 
-    // a keyword. To differentiate between the two types of keywords, 
-    // we’ll terminate the second type of keywords with a pipe (|) 
+    // This will be a NULL-terminated array of strings, each string containing
+    // a keyword. To differentiate between the two types of keywords,
+    // we’ll terminate the second type of keywords with a pipe (|)
     // character (also known as a vertical bar).
     char** keywords;
     // We let each language specify its own single-line comment pattern.
     char* singleline_comment_start;
-    // flags is a bit field that will contain flags for whether to 
-    // highlight numbers and whether to highlight strings for that 
+    // flags is a bit field that will contain flags for whether to
+    // highlight numbers and whether to highlight strings for that
     // filetype.
     char* multiline_comment_start;
     char* multiline_comment_end;
@@ -183,41 +183,41 @@ char* PYTHON_HL_keywords[] = {
     "and", "as", "assert", "break", "class", "continue", "def", "del", "elif",
     "else", "except", "exec", "finally", "for", "from", "global", "if", "import",
     "in", "is", "lambda", "not", "or", "pass", "print", "raise", "return", "try",
-    "while", "with", "yield", 
+    "while", "with", "yield",
 
-    "buffer|", "bytearray|", "complex|", "False|", "float|", "frozenset|", "int|", 
-    "list|", "long|", "None|", "set|", "str|", "tuple|", "True|", "type|", 
+    "buffer|", "bytearray|", "complex|", "False|", "float|", "frozenset|", "int|",
+    "list|", "long|", "None|", "set|", "str|", "tuple|", "True|", "type|",
     "unicode|", "xrange|", NULL
 };
 
 char* BASH_HL_keywords[] = {
-    "case", "do", "done", "elif", "else", "esac", "fi", "for", "function", "if", 
+    "case", "do", "done", "elif", "else", "esac", "fi", "for", "function", "if",
     "in", "select", "then", "time", "until", "while", "alias", "bg", "bind", "break",
     "builtin", "cd", "command", "continue", "declare", "dirs", "disown", "echo",
     "enable", "eval", "exec", "exit", "export", "fc", "fg", "getopts", "hash", "help",
     "history", "jobs", "kill", "let", "local", "logout", "popd", "pushd", "pwd", "read",
-    "readonly", "return", "set", "shift", "suspend", "test", "times", "trap", "type", 
+    "readonly", "return", "set", "shift", "suspend", "test", "times", "trap", "type",
     "typeset", "ulimit", "umask", "unalias", "unset", "wait", "printf", NULL
 };
 
 char* JS_HL_keywords[] = {
-    "break", "case", "catch", "class", "const", "continue", "debugger", "default", 
-    "delete", "do", "else", "enum", "export", "extends", "finally", "for", "function", 
-    "if", "implements", "import", "in", "instanceof", "interface", "let", "new", 
-    "package", "private", "protected", "public", "return", "static", "super", "switch", 
-    "this", "throw", "try", "typeof", "var", "void", "while", "with", "yield", "true", 
-    "false", "null", "NaN", "global", "window", "prototype", "constructor", "document", 
+    "break", "case", "catch", "class", "const", "continue", "debugger", "default",
+    "delete", "do", "else", "enum", "export", "extends", "finally", "for", "function",
+    "if", "implements", "import", "in", "instanceof", "interface", "let", "new",
+    "package", "private", "protected", "public", "return", "static", "super", "switch",
+    "this", "throw", "try", "typeof", "var", "void", "while", "with", "yield", "true",
+    "false", "null", "NaN", "global", "window", "prototype", "constructor", "document",
     "isNaN", "arguments", "undefined",
 
-    "Infinity|", "Array|", "Object|", "Number|", "String|", "Boolean|", "Function|", 
-    "ArrayBuffer|", "DataView|", "Float32Array|", "Float64Array|", "Int8Array|", 
-    "Int16Array|", "Int32Array|", "Uint8Array|", "Uint8ClampedArray|", "Uint32Array|", 
+    "Infinity|", "Array|", "Object|", "Number|", "String|", "Boolean|", "Function|",
+    "ArrayBuffer|", "DataView|", "Float32Array|", "Float64Array|", "Int8Array|",
+    "Int16Array|", "Int32Array|", "Uint8Array|", "Uint8ClampedArray|", "Uint32Array|",
     "Date|", "Error|", "Map|", "RegExp|", "Symbol|", "WeakMap|", "WeakSet|", "Set|", NULL
 };
 
 char* PHP_HL_keywords[] = {
     "__halt_compiler", "break", "clone", "die", "empty", "endswitch", "final", "global",
-    "include_once", "list", "private", "return", "try", "xor", "abstract", "callable", 
+    "include_once", "list", "private", "return", "try", "xor", "abstract", "callable",
     "const", "do", "enddeclare", "endwhile", "finally", "goto", "instanceof", "namespace",
     "protected", "static", "unset", "yield", "and", "case", "continue", "echo", "endfor",
     "eval", "for", "if", "insteadof", "new", "public", "switch", "use", "array", "catch",
@@ -418,18 +418,18 @@ void enableRawMode() {
     // Setting character size to 8 bits per byte (it should be
     // like that on most systems, but whatever).
     raw.c_cflag |= (CS8);
-    // Using NOT operator on ECHO | ICANON | IEXTEN | ISIG and  
-    // then bitwise-AND them with flags field in order to 
-    // force c_lflag 4th bit to become 0. This disables 
-    // chars being printed (ECHO) and let us turn off 
-    // canonical mode in order to read input byte-by-byte 
+    // Using NOT operator on ECHO | ICANON | IEXTEN | ISIG and
+    // then bitwise-AND them with flags field in order to
+    // force c_lflag 4th bit to become 0. This disables
+    // chars being printed (ECHO) and let us turn off
+    // canonical mode in order to read input byte-by-byte
     // instead of line-by-line (ICANON), ISIG disables
     // Ctrl-C command and IEXTEN the Ctrl-V one.
     raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
     // read() function now returns as soon as there is any
     // input to be read.
     raw.c_cc[VMIN] = 0;
-    // Forcing read() function to return every 1/10 of a 
+    // Forcing read() function to return every 1/10 of a
     // second if there is nothing to read.
     raw.c_cc[VTIME] = 1;
 
@@ -511,7 +511,7 @@ int editorReadKey() {
 int getWindowSize(int* screen_rows, int* screen_cols) {
     struct winsize ws;
 
-    // Getting window size thanks to ioctl into the given 
+    // Getting window size thanks to ioctl into the given
     // winsize struct.
     if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0) {
         return -1;
@@ -574,9 +574,9 @@ void consoleBufferClose() {
 /*** Syntax highlighting ***/
 
 int isSeparator(int c) {
-    // strchr() looks to see if any one of the characters in the first string 
-    // appear in the second string. If so, it returns a pointer to the 
-    // character in the second string that matched. Otherwise, it 
+    // strchr() looks to see if any one of the characters in the first string
+    // appear in the second string. If so, it returns a pointer to the
+    // character in the second string that matched. Otherwise, it
     // returns NULL.
     return isspace(c) || c == '\0' || strchr(",.()+-/*=~%<>[];", c) != NULL;
 }
@@ -588,7 +588,7 @@ int isAlsoNumber(int c) {
 void editorUpdateSyntax(editor_row* row) {
     row -> highlight = realloc(row -> highlight, row -> render_size);
     // void * memset ( void * ptr, int value, size_t num );
-    // Sets the first num bytes of the block of memory pointed by ptr to 
+    // Sets the first num bytes of the block of memory pointed by ptr to
     // the specified value. With this we set all characters to HL_NORMAL.
     memset(row -> highlight, HL_NORMAL, row -> render_size);
 
@@ -618,9 +618,9 @@ void editorUpdateSyntax(editor_row* row) {
         if (scs_len && !in_string && !in_comment) {
             // int strncmp ( const char * str1, const char * str2, size_t num );
             // Compares up to num characters of the C string str1 to those of the C string str2.
-            // This function starts comparing the first character of each string. If they are 
-            // equal to each other, it continues with the following pairs until the characters 
-            // differ, until a terminating null-character is reached, or until num characters 
+            // This function starts comparing the first character of each string. If they are
+            // equal to each other, it continues with the following pairs until the characters
+            // differ, until a terminating null-character is reached, or until num characters
             // match in both strings, whichever happens first.
             if (!strncmp(&row -> render[i], scs, scs_len)) {
                 memset(&row -> highlight[i], HL_SL_COMMENT, row -> render_size - i);
@@ -647,16 +647,16 @@ void editorUpdateSyntax(editor_row* row) {
                 in_comment = 1;
                 continue;
             }
-            
+
         }
 
         if (ec.syntax -> flags & HL_HIGHLIGHT_STRINGS) {
             if (in_string) {
                 row -> highlight[i] = HL_STRING;
-                // If we’re in a string and the current character is a backslash (\), 
-                // and there’s at least one more character in that line that comes 
-                // after the backslash, then we highlight the character that comes 
-                // after the backslash with HL_STRING and consume it. We increment 
+                // If we’re in a string and the current character is a backslash (\),
+                // and there’s at least one more character in that line that comes
+                // after the backslash, then we highlight the character that comes
+                // after the backslash with HL_STRING and consume it. We increment
                 // i by 2 to consume both characters at once.
                 if (c == '\\' && i + 1 < row -> render_size) {
                     row -> highlight[i + 1] = HL_STRING;
@@ -716,19 +716,19 @@ void editorUpdateSyntax(editor_row* row) {
     }
 
     int changed = (row -> hl_open_comment != in_comment);
-    // This tells us whether the row ended as an unclosed multi-line 
+    // This tells us whether the row ended as an unclosed multi-line
     // comment or not.
     row -> hl_open_comment = in_comment;
-    // A user could comment out an entire file just by changing one line. 
-    // So it seems like we need to update the syntax of all the lines 
-    // following the current line. However, we know the highlighting 
-    // of the next line will not change if the value of this line’s 
-    // // // hl_open_comment did not change. So we check if it changed, and 
-    // // only call editorUpdateSyntax() on the next line if 
-    // hl_open_comment changed (and if there is a next line in the file). 
-    // Because editorUpdateSyntax() keeps calling itself with the next 
-    // line, the change will continue to propagate to more and more lines 
-    // until one of them is unchanged, at which point we know that all 
+    // A user could comment out an entire file just by changing one line.
+    // So it seems like we need to update the syntax of all the lines
+    // following the current line. However, we know the highlighting
+    // of the next line will not change if the value of this line’s
+    // // // hl_open_comment did not change. So we check if it changed, and
+    // // only call editorUpdateSyntax() on the next line if
+    // hl_open_comment changed (and if there is a next line in the file).
+    // Because editorUpdateSyntax() keeps calling itself with the next
+    // line, the change will continue to propagate to more and more lines
+    // until one of them is unchanged, at which point we know that all
     // the lines after that one must be unchanged as well.
     if (changed && row -> idx + 1 < ec.num_rows)
         editorUpdateSyntax(&ec.row[row -> idx + 1]);
@@ -762,7 +762,7 @@ void editorSelectSyntaxHighlight() {
         while (es -> file_match[i]) {
             char* p = strstr(ec.file_name, es -> file_match[i]);
             if (p != NULL) {
-                // Returns a pointer to the first occurrence of str2 in str1, 
+                // Returns a pointer to the first occurrence of str2 in str1,
                 // or a null pointer if str2 is not part of str1.
                 int pat_len = strlen(es -> file_match[i]);
                 if (es -> file_match[i][0] != '.' || p[pat_len] == '\0') {
@@ -786,13 +786,13 @@ void editorSelectSyntaxHighlight() {
 int editorRowCursorXToRenderX(editor_row* row, int cursor_x) {
     int render_x = 0;
     int j;
-    // For each character, if its a tab we use rx % TTE_TAB_STOP 
-    // to find out how many columns we are to the right of the last 
-    // tab stop, and then subtract that from TTE_TAB_STOP - 1 to 
-    // find out how many columns we are to the left of the next tab 
-    // stop. We add that amount to rx to get just to the left of the 
-    // next tab stop, and then the unconditional rx++ statement gets 
-    // us right on the next tab stop. Notice how this works even if 
+    // For each character, if its a tab we use rx % TTE_TAB_STOP
+    // to find out how many columns we are to the right of the last
+    // tab stop, and then subtract that from TTE_TAB_STOP - 1 to
+    // find out how many columns we are to the left of the next tab
+    // stop. We add that amount to rx to get just to the left of the
+    // next tab stop, and then the unconditional rx++ statement gets
+    // us right on the next tab stop. Notice how this works even if
     // we are currently on a tab stop.
     for (j = 0; j < cursor_x; j++) {
         if (row -> chars[j] == '\t')
@@ -817,12 +817,12 @@ int editorRowRenderXToCursorX(editor_row* row, int render_x) {
 }
 
 void editorUpdateRow(editor_row* row) {
-    // First, we have to loop through the chars of the row 
-    // and count the tabs in order to know how much memory 
-    // to allocate for render. The maximum number of characters 
-    // needed for each tab is 8. row->size already counts 1 for 
-    // each tab, so we multiply the number of tabs by 7 and add 
-    // that to row->size to get the maximum amount of memory we'll 
+    // First, we have to loop through the chars of the row
+    // and count the tabs in order to know how much memory
+    // to allocate for render. The maximum number of characters
+    // needed for each tab is 8. row->size already counts 1 for
+    // each tab, so we multiply the number of tabs by 7 and add
+    // that to row->size to get the maximum amount of memory we'll
     // need for the rendered row.
     int tabs = 0;
     int j;
@@ -833,10 +833,10 @@ void editorUpdateRow(editor_row* row) {
     free(row -> render);
     row -> render = malloc(row -> size + tabs * (TTE_TAB_STOP - 1) + 1);
 
-    // After allocating the memory, we check whether the current character 
-    // is a tab. If it is, we append one space (because each tab must 
-    // advance the cursor forward at least one column), and then append 
-    // spaces until we get to a tab stop, which is a column that is 
+    // After allocating the memory, we check whether the current character
+    // is a tab. If it is, we append one space (because each tab must
+    // advance the cursor forward at least one column), and then append
+    // spaces until we get to a tab stop, which is a column that is
     // divisible by 8
     int idx = 0;
     for (j = 0; j < row -> size; j++) {
@@ -844,7 +844,7 @@ void editorUpdateRow(editor_row* row) {
             row -> render[idx++] = ' ';
             while (idx % TTE_TAB_STOP != 0)
                 row -> render[idx++] = ' ';
-        } else 
+        } else
             row -> render[idx++] = row -> chars[j];
     }
     row -> render[idx] = '\0';
@@ -913,7 +913,7 @@ void editorFlipRow(int dir) {
     int first = (dir == 1) ? ec.cursor_y - 1 : ec.cursor_y;
     editorUpdateSyntax(&ec.row[first]);
     editorUpdateSyntax(&ec.row[first] + 1);
-    if (ec.num_rows - ec.cursor_y > 2) 
+    if (ec.num_rows - ec.cursor_y > 2)
       editorUpdateSyntax(&ec.row[first] + 2);
 
     ec.cursor_y -= dir;
@@ -963,7 +963,7 @@ void editorRowInsertChar(editor_row* row, int at, int c) {
 }
 
 void editorInsertNewline() {
-    // If we're at the beginning of a line, all we have to do is insert 
+    // If we're at the beginning of a line, all we have to do is insert
     // a new blank row before the line we're on.
     if (ec.cursor_x == 0) {
         editorInsertRow(ec.cursor_y, "", 0);
@@ -1039,7 +1039,7 @@ char* editorRowsToString(int* buf_len) {
     int total_len = 0;
     int j;
     // Adding up the lengths of each row of text, adding 1
-    // to each one for the newline character we'll add to 
+    // to each one for the newline character we'll add to
     // the end of each line.
     for (j = 0; j < ec.num_rows; j++) {
         total_len += ec.row[j].size + 1;
@@ -1142,7 +1142,7 @@ void editorSearchCallback(char* query, int key) {
         saved_hightlight = NULL;
     }
 
-    // Checking if the user pressed Enter or Escape, in which case 
+    // Checking if the user pressed Enter or Escape, in which case
     // they are leaving search mode so we return immediately.
     if (key == '\r' || key == '\x1b') {
         last_match = -1;
@@ -1199,7 +1199,7 @@ void editorSearch() {
 
     if (query) {
         free(query);
-    // If query is NULL, that means they pressed Escape, so in that case we 
+    // If query is NULL, that means they pressed Escape, so in that case we
     // restore the cursor previous position.
     } else {
         ec.cursor_x = saved_cursor_x;
@@ -1238,11 +1238,11 @@ void editorScroll() {
     ec.render_x = 0;
     if (ec.cursor_y < ec.num_rows)
         ec.render_x = editorRowCursorXToRenderX(&ec.row[ec.cursor_y], ec.cursor_x);
-    // The first if statement checks if the cursor is above the visible window, 
-    // and if so, scrolls up to where the cursor is. The second if statement checks 
-    // if the cursor is past the bottom of the visible window, and contains slightly 
-    // more complicated arithmetic because ec.row_offset refers to what's at the top 
-    // of the screen, and we have to get ec.screen_rows involved to talk about what's 
+    // The first if statement checks if the cursor is above the visible window,
+    // and if so, scrolls up to where the cursor is. The second if statement checks
+    // if the cursor is past the bottom of the visible window, and contains slightly
+    // more complicated arithmetic because ec.row_offset refers to what's at the top
+    // of the screen, and we have to get ec.screen_rows involved to talk about what's
     // at the bottom of the screen.
     if (ec.cursor_y < ec.row_offset)
         ec.row_offset = ec.cursor_y;
@@ -1258,8 +1258,8 @@ void editorScroll() {
 void editorDrawStatusBar(struct a_buf* ab) {
     // This switches to inverted colors.
     // NOTE:
-    // The m command (Select Graphic Rendition) causes the text printed 
-    // after it to be printed with various possible attributes including 
+    // The m command (Select Graphic Rendition) causes the text printed
+    // after it to be printed with various possible attributes including
     // bold (1), underscore (4), blink (5), and inverted colors (7). An
     // argument of 0 clears all attributes (the default one). See
     // http://vt100.net/docs/vt100-ug/chapter3.html#SGR for more info.
@@ -1321,17 +1321,17 @@ void editorDrawWelcomeMessage(struct a_buf* ab) {
     abufAppend(ab, welcome, welcome_len);
 }
 
-// The ... argument makes editorSetStatusMessage() a variadic function, 
-// meaning it can take any number of arguments. C's way of dealing with 
-// these arguments is by having you call va_start() and va_end() on a 
-// // value of type va_list. The last argument before the ... (in this 
-// case, msg) must be passed to va_start(), so that the address of 
-// the next arguments is known. Then, between the va_start() and 
-// va_end() calls, you would call va_arg() and pass it the type of 
-// the next argument (which you usually get from the given format 
-// string) and it would return the value of that argument. In 
-// this case, we pass msg and args to vsnprintf() and it takes care 
-// of reading the format string and calling va_arg() to get each 
+// The ... argument makes editorSetStatusMessage() a variadic function,
+// meaning it can take any number of arguments. C's way of dealing with
+// these arguments is by having you call va_start() and va_end() on a
+// // value of type va_list. The last argument before the ... (in this
+// case, msg) must be passed to va_start(), so that the address of
+// the next arguments is known. Then, between the va_start() and
+// va_end() calls, you would call va_arg() and pass it the type of
+// the next argument (which you usually get from the given format
+// string) and it would return the value of that argument. In
+// this case, we pass msg and args to vsnprintf() and it takes care
+// of reading the format string and calling va_arg() to get each
 // argument.
 void editorSetStatusMessage(const char* msg, ...) {
     va_list args;
@@ -1352,14 +1352,14 @@ void editorDrawRows(struct a_buf* ab) {
                 abufAppend(ab, "~", 1);
         } else {
             int len = ec.row[file_row].render_size - ec.col_offset;
-            // len can be a negative number, meaning the user scrolled 
-            // horizontally past the end of the line. In that case, we set 
+            // len can be a negative number, meaning the user scrolled
+            // horizontally past the end of the line. In that case, we set
             // len to 0 so that nothing is displayed on that line.
             if (len < 0)
                 len = 0;
             if (len > ec.screen_cols)
                 len = ec.screen_cols;
-            
+
             char* c = &ec.row[file_row].render[ec.col_offset];
             unsigned char* highlight = &ec.row[file_row].highlight[ec.col_offset];
             int current_color = -1;
@@ -1420,7 +1420,7 @@ void editorRefreshScreen() {
     editorDrawRows(&ab);
     editorDrawStatusBar(&ab);
     editorDrawMessageBar(&ab);
-    
+
     // Moving the cursor where it should be.
     char buf[32];
     snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (ec.cursor_y - ec.row_offset) + 1, (ec.render_x - ec.col_offset) + 1);
@@ -1428,7 +1428,7 @@ void editorRefreshScreen() {
 
     // Showing again the cursor.
     abufAppend(&ab, "\x1b[?25h", 6);
-    
+
     // Writing all content at once
     write(STDOUT_FILENO, ab.buf, ab.len);
     abufFree(&ab);
@@ -1439,9 +1439,9 @@ void editorClearScreen() {
     // - (1 byte) \x1b : escape character
     // - (3 bytes) [2J : Clears the entire screen, see
     // http://vt100.net/docs/vt100-ug/chapter3.html#ED
-    // for more info. 
+    // for more info.
     write(STDOUT_FILENO, "\x1b[2J", 4);
-    // Writing 3 bytes to reposition the cursor back at 
+    // Writing 3 bytes to reposition the cursor back at
     // the top-left corner, see
     // http://vt100.net/docs/vt100-ug/chapter3.html#CUP
     // for more info.
@@ -1574,7 +1574,7 @@ void editorProcessKeypress() {
             break;
         case CTRL_KEY('p'):
             consoleBufferClose();
-            kill(0, SIGTSTP); 
+            kill(0, SIGTSTP);
         case ARROW_UP:
         case ARROW_DOWN:
         case ARROW_LEFT:
@@ -1640,11 +1640,11 @@ void initEditor() {
     ec.syntax = NULL;
 
     editorUpdateWindowSize();
-    // The SIGWINCH signal is sent to a process when its controlling 
+    // The SIGWINCH signal is sent to a process when its controlling
     // terminal changes its size (a window change).
     signal(SIGWINCH, editorHandleSigwinch);
-    // The SIGCONT signal instructs the operating system to continue 
-    // (restart) a process previously paused by the SIGSTOP or SIGTSTP 
+    // The SIGCONT signal instructs the operating system to continue
+    // (restart) a process previously paused by the SIGSTOP or SIGTSTP
     // signal.
     signal(SIGCONT, editorHandleSigcont);
 }
