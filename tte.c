@@ -71,10 +71,10 @@ typedef struct editor_row {
 } editor_row;
 
 struct editor_syntax {
-    // filetype field is the name of the filetype that will be displayed 
+    // file_type field is the name of the filetype that will be displayed 
     // to the user in the status bar.
     char* file_type;
-    // filematch is an array of strings, where each string contains a 
+    // file_match is an array of strings, where each string contains a 
     // pattern to match a filename against. If the filename matches, 
     // then the file will be recognized as having that filetype.
     char** file_match;
@@ -923,7 +923,7 @@ void editorFlipRow(int dir) {
 void editorCopy(int cut) {
 	ec.copied_char_buffer = realloc(ec.copied_char_buffer, strlen(ec.row[ec.cursor_y].chars) + 1);
 	strcpy(ec.copied_char_buffer, ec.row[ec.cursor_y].chars);
-	editorSetStatusMessage(cut ? "Content cutted" : "Content copied");
+	editorSetStatusMessage(cut ? "Content cut" : "Content copied");
 }
 
 void editorCut() {
@@ -1013,7 +1013,7 @@ void editorInsertChar(int c) {
 }
 
 void editorDelChar() {
-    // If the cursor is pats the end of the file, there's nothing to delete.
+    // If the cursor is past the end of the file, there's nothing to delete.
     if (ec.cursor_y == ec.num_rows)
         return;
     // Cursor is at the beginning of a file, there's nothing to delete.
