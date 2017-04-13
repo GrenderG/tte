@@ -107,7 +107,7 @@ struct editor_config {
     char* file_name;
     char status_msg[80];
     time_t status_msg_time;
-	char* copied_char_buffer;
+    char* copied_char_buffer;
     struct editor_syntax* syntax;
     struct termios orig_termios;
 } ec;
@@ -227,44 +227,44 @@ char* PHP_HL_keywords[] = {
 };
 
 char* JSON_HL_keywords[] = {
-	NULL
+    NULL
 };
 
 char* XML_HL_keywords[] = {
-	NULL
+    NULL
 };
 
 char* SQL_HL_keywords[] = {
-	"SELECT", "FROM", "DROP", "CREATE", "TABLE", "DEFAULT", "FOREIGN", "UPDATE", "LOCK",
-	"INSERT", "INTO", "VALUES", "LOCK", "UNLOCK", "WHERE", "DINSTINCT", "BETWEEN", "NOT",
-	"NULL", "TO", "ON", "ORDER", "GROUP", "IF", "BY", "HAVING", "USING", "UNION", "UNIQUE",
-	"AUTO_INCREMENT", "LIKE", "WITH", "INNER", "OUTER", "JOIN", "COLUMN", "DATABASE", "EXISTS",
-	"NATURAL", "LIMIT", "UNSIGNED", "MAX", "MIN", "PRECISION", "ALTER", "DELETE", "CASCADE",
-	"PRIMARY", "KEY", "CONSTRAINT", "ENGINE", "CHARSET", "REFERENCES", "WRITE",
+    "SELECT", "FROM", "DROP", "CREATE", "TABLE", "DEFAULT", "FOREIGN", "UPDATE", "LOCK",
+    "INSERT", "INTO", "VALUES", "LOCK", "UNLOCK", "WHERE", "DINSTINCT", "BETWEEN", "NOT",
+    "NULL", "TO", "ON", "ORDER", "GROUP", "IF", "BY", "HAVING", "USING", "UNION", "UNIQUE",
+    "AUTO_INCREMENT", "LIKE", "WITH", "INNER", "OUTER", "JOIN", "COLUMN", "DATABASE", "EXISTS",
+    "NATURAL", "LIMIT", "UNSIGNED", "MAX", "MIN", "PRECISION", "ALTER", "DELETE", "CASCADE",
+    "PRIMARY", "KEY", "CONSTRAINT", "ENGINE", "CHARSET", "REFERENCES", "WRITE",
 
-	"BIT|", "TINYINT|", "BOOL|", "BOOLEAN|", "SMALLINT|", "MEDIUMINT|", "INT|", "INTEGER|",
-	"BIGINT|", "DOUBLE|", "DECIMAL|", "DEC|" "FLOAT|", "DATE|", "DATETIME|", "TIMESTAMP|",
-	"TIME|", "YEAR|", "CHAR|", "VARCHAR|", "TEXT|", "ENUM|", "SET|", "BLOB|", "VARBINARY|",
-	"TINYBLOB|", "TINYTEXT|", "MEDIUMBLOB|", "MEDIUMTEXT|", "LONGTEXT|",
+    "BIT|", "TINYINT|", "BOOL|", "BOOLEAN|", "SMALLINT|", "MEDIUMINT|", "INT|", "INTEGER|",
+    "BIGINT|", "DOUBLE|", "DECIMAL|", "DEC|" "FLOAT|", "DATE|", "DATETIME|", "TIMESTAMP|",
+    "TIME|", "YEAR|", "CHAR|", "VARCHAR|", "TEXT|", "ENUM|", "SET|", "BLOB|", "VARBINARY|",
+    "TINYBLOB|", "TINYTEXT|", "MEDIUMBLOB|", "MEDIUMTEXT|", "LONGTEXT|",
 
-	"select", "from", "drop", "create", "table", "default", "foreign", "update", "lock",
-	"insert", "into", "values", "lock", "unlock", "where", "dinstinct", "between", "not",
-	"null", "to", "on", "order", "group", "if", "by", "having", "using", "union", "unique",
-	"auto_increment", "like", "with", "inner", "outer", "join", "column", "database", "exists",
-	"natural", "limit", "unsigned", "max", "min", "precision", "alter", "delete", "cascade",
-	"primary", "key", "constraint", "engine", "charset", "references", "write",
+    "select", "from", "drop", "create", "table", "default", "foreign", "update", "lock",
+    "insert", "into", "values", "lock", "unlock", "where", "dinstinct", "between", "not",
+    "null", "to", "on", "order", "group", "if", "by", "having", "using", "union", "unique",
+    "auto_increment", "like", "with", "inner", "outer", "join", "column", "database", "exists",
+    "natural", "limit", "unsigned", "max", "min", "precision", "alter", "delete", "cascade",
+    "primary", "key", "constraint", "engine", "charset", "references", "write",
 
-	"bit|", "tinyint|", "bool|", "boolean|", "smallint|", "mediumint|", "int|", "integer|",
-	"bigint|", "double|", "decimal|", "dec|" "float|", "date|", "datetime|", "timestamp|",
-	"time|", "year|", "char|", "varchar|", "text|", "enum|", "set|", "blob|", "varbinary|",
-	"tinyblob|", "tinytext|", "mediumblob|", "mediumtext|", "longtext|", NULL
+    "bit|", "tinyint|", "bool|", "boolean|", "smallint|", "mediumint|", "int|", "integer|",
+    "bigint|", "double|", "decimal|", "dec|" "float|", "date|", "datetime|", "timestamp|",
+    "time|", "year|", "char|", "varchar|", "text|", "enum|", "set|", "blob|", "varbinary|",
+    "tinyblob|", "tinytext|", "mediumblob|", "mediumtext|", "longtext|", NULL
 };
 
 char* RUBY_HL_keywords[] = {
-	"__ENCODING__", "__LINE__", "__FILE__", "BEGIN", "END", "alias", "and", "begin", "break",
-	"case", "class", "def", "defined?", "do", "else", "elsif", "end", "ensure", "for", "if",
-	"in", "module", "next", "not", "or", "redo", "rescue", "retry", "return", "self", "super",
-	"then", "undef", "unless", "until", "when", "while", "yield", NULL
+    "__ENCODING__", "__LINE__", "__FILE__", "BEGIN", "END", "alias", "and", "begin", "break",
+    "case", "class", "def", "defined?", "do", "else", "elsif", "end", "ensure", "for", "if",
+    "in", "module", "next", "not", "or", "redo", "rescue", "retry", "return", "self", "super",
+    "then", "undef", "unless", "until", "when", "while", "yield", NULL
 };
 
 struct editor_syntax HL_DB[] = {
@@ -913,38 +913,38 @@ void editorFlipRow(int dir) {
     int first = (dir == 1) ? ec.cursor_y - 1 : ec.cursor_y;
     editorUpdateSyntax(&ec.row[first]);
     editorUpdateSyntax(&ec.row[first] + 1);
-	if (ec.num_rows - ec.cursor_y > 2) 
-	    editorUpdateSyntax(&ec.row[first] + 2);
+    if (ec.num_rows - ec.cursor_y > 2) 
+      editorUpdateSyntax(&ec.row[first] + 2);
 
     ec.cursor_y -= dir;
     ec.dirty++;
 }
 
 void editorCopy(int cut) {
-	ec.copied_char_buffer = realloc(ec.copied_char_buffer, strlen(ec.row[ec.cursor_y].chars) + 1);
-	strcpy(ec.copied_char_buffer, ec.row[ec.cursor_y].chars);
-	editorSetStatusMessage(cut ? "Content cut" : "Content copied");
+    ec.copied_char_buffer = realloc(ec.copied_char_buffer, strlen(ec.row[ec.cursor_y].chars) + 1);
+    strcpy(ec.copied_char_buffer, ec.row[ec.cursor_y].chars);
+    editorSetStatusMessage(cut ? "Content cut" : "Content copied");
 }
 
 void editorCut() {
-	editorCopy(-1);
-	editorDelRow(ec.cursor_y);
-	if (ec.num_rows - ec.cursor_y > 0)
-		editorUpdateSyntax(&ec.row[ec.cursor_y]);
-	if (ec.num_rows - ec.cursor_y > 1)
-		editorUpdateSyntax(&ec.row[ec.cursor_y + 1]);
-	ec.cursor_x = ec.cursor_y == ec.num_rows ? 0 : ec.row[ec.cursor_y].size;
+    editorCopy(-1);
+    editorDelRow(ec.cursor_y);
+    if (ec.num_rows - ec.cursor_y > 0)
+      editorUpdateSyntax(&ec.row[ec.cursor_y]);
+    if (ec.num_rows - ec.cursor_y > 1)
+      editorUpdateSyntax(&ec.row[ec.cursor_y + 1]);
+    ec.cursor_x = ec.cursor_y == ec.num_rows ? 0 : ec.row[ec.cursor_y].size;
 }
 
 void editorPaste() {
-	if (ec.copied_char_buffer == NULL)
-		return;
-	
-	if (ec.cursor_y == ec.num_rows)
-		editorInsertRow(ec.cursor_y, ec.copied_char_buffer, strlen(ec.copied_char_buffer));
-	else
-		editorRowAppendString(&ec.row[ec.cursor_y], ec.copied_char_buffer, strlen(ec.copied_char_buffer));
-	ec.cursor_x += strlen(ec.copied_char_buffer);
+    if (ec.copied_char_buffer == NULL)
+      return;
+
+    if (ec.cursor_y == ec.num_rows)
+      editorInsertRow(ec.cursor_y, ec.copied_char_buffer, strlen(ec.copied_char_buffer));
+    else
+      editorRowAppendString(&ec.row[ec.cursor_y], ec.copied_char_buffer, strlen(ec.copied_char_buffer));
+    ec.cursor_x += strlen(ec.copied_char_buffer);
 }
 
 void editorRowInsertChar(editor_row* row, int at, int c) {
@@ -1548,7 +1548,7 @@ void editorProcessKeypress() {
             }
             editorClearScreen();
             consoleBufferClose();
-			exit(0);
+            exit(0);
             break;
         case CTRL_KEY('s'):
             editorSave();
@@ -1559,22 +1559,22 @@ void editorProcessKeypress() {
             break;
         case CTRL_KEY('d'):
             if (ec.cursor_y < ec.num_rows - 1)
-                editorFlipRow(-1);
-        	break;
-		case CTRL_KEY('x'):
-			if (ec.cursor_y < ec.num_rows)
-				editorCut();
-			break;
-		case CTRL_KEY('c'):
-			if (ec.cursor_y < ec.num_rows)
-				editorCopy(0);
-			break;
-		case CTRL_KEY('v'):
-			editorPaste();
-			break;
-		case CTRL_KEY('p'):
-			consoleBufferClose();
-			kill(0, SIGTSTP); 
+            editorFlipRow(-1);
+            break;
+        case CTRL_KEY('x'):
+            if (ec.cursor_y < ec.num_rows)
+            editorCut();
+            break;
+        case CTRL_KEY('c'):
+            if (ec.cursor_y < ec.num_rows)
+            editorCopy(0);
+            break;
+        case CTRL_KEY('v'):
+            editorPaste();
+            break;
+        case CTRL_KEY('p'):
+            consoleBufferClose();
+            kill(0, SIGTSTP); 
         case ARROW_UP:
         case ARROW_DOWN:
         case ARROW_LEFT:
@@ -1636,7 +1636,7 @@ void initEditor() {
     ec.file_name = NULL;
     ec.status_msg[0] = '\0';
     ec.status_msg_time = 0;
-	ec.copied_char_buffer = NULL;
+    ec.copied_char_buffer = NULL;
     ec.syntax = NULL;
 
     editorUpdateWindowSize();
