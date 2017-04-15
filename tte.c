@@ -1151,6 +1151,10 @@ void editorSearchCallback(char* query, int key) {
     } else if (key == ARROW_RIGHT || key == ARROW_DOWN) {
         direction = 1;
     } else if (key == ARROW_LEFT || key == ARROW_UP) {
+        if (last_match == -1) {
+            // If nothing matched and the left or up arrow key was pressed
+            return;
+        }
         direction = -1;
     } else {
         last_match = -1;
