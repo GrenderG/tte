@@ -1067,7 +1067,7 @@ void editorOpen(char* file_name) {
 
     editorSelectSyntaxHighlight();
 
-    FILE* file = fopen(file_name, "a+");
+    FILE* file = fopen(file_name, "r+");
     if (!file)
         die("Failed to open the file");
 
