@@ -49,7 +49,7 @@
 // Empty buffer
 #define ABUF_INIT {NULL, 0}
 // Version code
-#define TTE_VERSION "0.0.4"
+#define TTE_VERSION "0.0.5"
 // Length of a tab stop
 #define TTE_TAB_STOP 4
 // Times to press Ctrl-Q before exiting
@@ -578,7 +578,7 @@ int isSeparator(int c) {
     // appear in the second string. If so, it returns a pointer to the
     // character in the second string that matched. Otherwise, it
     // returns NULL.
-    return isspace(c) || c == '\0' || strchr(",.()+-/*=~%<>[];", c) != NULL;
+    return isspace(c) || c == '\0' || strchr(",.()+-/*=~%<>[]:;", c) != NULL;
 }
 
 int isAlsoNumber(int c) {
