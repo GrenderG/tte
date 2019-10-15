@@ -105,6 +105,7 @@ struct editor_config {
     editor_row* row;
     int dirty; // To know if a file has been modified since opening.
     char* file_name;
+    char extension[10];
     char status_msg[80];
     time_t status_msg_time;
     char* copied_char_buffer;
@@ -750,29 +751,39 @@ int editorSyntaxToColor(int highlight) {
     }
 }
 
+void editorApplySyntaxHighlight() {
+    if (ec.syntax == NULL)
+        return;
+
+    int file_row;
+    for (file_row = 0; file_row < ec.num_rows; file_row++) {
+        editorUpdateSyntax(&ec.row[file_row]);
+    }
+}
+
 void editorSelectSyntaxHighlight() {
     ec.syntax = NULL;
     if (ec.file_name == NULL)
         return;
+
+    char* ext_name = ec.extension[0] == '\0' ? ec.file_name : ec.extension;
 
     for (unsigned int j = 0; j < HL_DB_ENTRIES; j++) {
         struct editor_syntax* es = &HL_DB[j];
         unsigned int i = 0;
 
         while (es -> file_match[i]) {
-            char* p = strstr(ec.file_name, es -> file_match[i]);
+            char* p = strstr(ext_name, es -> file_match[i]);
             if (p != NULL) {
                 // Returns a pointer to the first occurrence of str2 in str1,
                 // or a null pointer if str2 is not part of str1.
                 int pat_len = strlen(es -> file_match[i]);
                 if (es -> file_match[i][0] != '.' || p[pat_len] == '\0') {
                     ec.syntax = es;
-
-                    int file_row;
-                    for (file_row = 0; file_row < ec.num_rows; file_row++) {
-                        editorUpdateSyntax(&ec.row[file_row]);
-                    }
-
+                    size_t len = strlen(es -> file_match[i]);
+                    strncpy(ec.extension, es -> file_match[i], len);
+                    // Apply the highlighting
+                    editorApplySyntaxHighlight();
                     return;
                 }
             }
@@ -1095,7 +1106,7 @@ void editorSave() {
             editorSetStatusMessage("Save aborted");
             return;
         }
-        editorSelectSyntaxHighlight();
+        editorApplySyntaxHighlight();
     }
 
     int len;
@@ -1638,6 +1649,7 @@ void initEditor() {
     ec.row = NULL;
     ec.dirty = 0;
     ec.file_name = NULL;
+    ec.extension[0] = '\0';
     ec.status_msg[0] = '\0';
     ec.status_msg_time = 0;
     ec.copied_char_buffer = NULL;
@@ -1687,6 +1699,10 @@ int handleArgs(int argc, char* argv[]) {
         } else if(strncmp("-v", argv[1], 2) == 0 || strncmp("--version", argv[1], 9) == 0) {
             printf("tte - version %s\n", TTE_VERSION);
             return -1;
+        } else if (strncmp("-e", argv[1], 2) == 0 || strncmp("--extension", argv[1], 11) == 0) {
+            size_t len = strlen(argv[2]);
+            strncpy(ec.extension, argv[2], len);
+            return 2;
         }
     }
 
@@ -1698,6 +1714,8 @@ int main(int argc, char* argv[]) {
     int arg_response = handleArgs(argc, argv);
     if (arg_response == 1)
         editorOpen(argv[1]);
+    else if (arg_response == 2)
+        editorOpen(argv[3]);
     else if (arg_response == -1)
         return 0;
     enableRawMode();
