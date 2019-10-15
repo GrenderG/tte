@@ -1106,7 +1106,7 @@ void editorSave() {
             editorSetStatusMessage("Save aborted");
             return;
         }
-        editorApplySyntaxHighlight();
+        editorSelectSyntaxHighlight();
     }
 
     int len;
