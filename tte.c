@@ -1072,13 +1072,21 @@ char* editorRowsToString(int* buf_len) {
     return buf;
 }
 
+static int fileExists(const char* file_name) {
+    struct stat s = {0};
+    return stat(file_name, &s) == 0;
+}
+
 void editorOpen(char* file_name) {
     free(ec.file_name);
     ec.file_name = strdup(file_name);
 
     editorSelectSyntaxHighlight();
 
-    FILE* file = fopen(file_name, "r+");
+    // If the file dosen't exist, create it, otherwise just open it
+    const char *mode = fileExists(file_name) ? "r+" : "w+";
+
+    FILE* file = fopen(file_name, mode);
     if (!file)
         die("Failed to open the file");
 
