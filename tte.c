@@ -1330,7 +1330,7 @@ void editorDrawWelcomeMessage(struct a_buf* ab) {
     // Using snprintf to truncate message in case the terminal
     // is too tiny to handle the entire string.
     int welcome_len = snprintf(welcome, sizeof(welcome),
-        "tte %s <http://dmoral.es/>", TTE_VERSION);
+        "tte %s <https://github.com/GrenderG/tte>", TTE_VERSION);
     if (welcome_len > ec.screen_cols)
         welcome_len = ec.screen_cols;
     // Centering the message.
