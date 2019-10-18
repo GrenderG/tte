@@ -37,6 +37,7 @@
 #include <string.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <termios.h>
 #include <time.h>
 #include <unistd.h>
@@ -49,7 +50,7 @@
 // Empty buffer
 #define ABUF_INIT {NULL, 0}
 // Version code
-#define TTE_VERSION "0.0.6"
+#define TTE_VERSION "0.0.7"
 // Length of a tab stop
 #define TTE_TAB_STOP 4
 // Times to press Ctrl-Q before exiting
@@ -1598,6 +1599,7 @@ void editorProcessKeypress() {
         case CTRL_KEY('p'):
             consoleBufferClose();
             kill(0, SIGTSTP);
+			break;
         case ARROW_UP:
         case ARROW_DOWN:
         case ARROW_LEFT:
