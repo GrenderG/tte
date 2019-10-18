@@ -1599,7 +1599,7 @@ void editorProcessKeypress() {
         case CTRL_KEY('p'):
             consoleBufferClose();
             kill(0, SIGTSTP);
-			break;
+            break;
         case ARROW_UP:
         case ARROW_DOWN:
         case ARROW_LEFT:
