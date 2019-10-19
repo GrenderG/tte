@@ -41,6 +41,8 @@ Ctrl-D : Flip line downwards
 Ctrl-C : Copy line
 Ctrl-X : Cut line
 Ctrl-V : Paste line
+Ctrl-Z : Undo
+Ctrl-Y : Redo
 Ctrl-P : Pause tte (type "fg" to resume)
 ```
 
