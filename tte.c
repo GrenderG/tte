@@ -34,6 +34,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
@@ -58,6 +59,15 @@
 // Highlight flags
 #define HL_HIGHLIGHT_NUMBERS (1 << 0)
 #define HL_HIGHLIGHT_STRINGS (1 << 1)
+// Status print indicators
+#define NO_STATUS false
+#define STATUS_YES true
+// Max Undo/Redo Operations
+// Set to -1 for unlimited Undo
+// Set to 0 to disable Undo
+#define ACTIONS_LIST_MAX_SIZE 50
+
+typedef struct ActionList ActionList;
 
 /*** Data section ***/
 
@@ -113,6 +123,7 @@ struct editor_config {
     char* copied_char_buffer;
     struct editor_syntax* syntax;
     struct termios orig_termios;
+    ActionList* actions;
 } ec;
 
 // Having a dynamic buffer will allow us to write only one
@@ -146,6 +157,18 @@ enum editor_highlight {
     HL_NUMBER,
     HL_MATCH
 };
+
+/*** Edit actions ***/
+enum ActionType {
+    CutLine,
+    PasteLine,
+    FlipUp,
+    FlipDown,
+    NewLine,
+    InsertChar,
+    DelChar,
+};
+typedef enum ActionType ActionType;
 
 /*** Filetypes ***/
 
@@ -933,20 +956,20 @@ void editorFlipRow(int dir) {
     ec.dirty++;
 }
 
-void editorCopy(int cut) {
+void editorCopy(bool printStatus) {
     ec.copied_char_buffer = realloc(ec.copied_char_buffer, strlen(ec.row[ec.cursor_y].chars) + 1);
     strcpy(ec.copied_char_buffer, ec.row[ec.cursor_y].chars);
-    editorSetStatusMessage(cut ? "Content cut" : "Content copied");
+    if(printStatus) editorSetStatusMessage("Content copied");
 }
 
 void editorCut() {
-    editorCopy(-1);
     editorDelRow(ec.cursor_y);
     if (ec.num_rows - ec.cursor_y > 0)
-      editorUpdateSyntax(&ec.row[ec.cursor_y]);
+        editorUpdateSyntax(&ec.row[ec.cursor_y]);
     if (ec.num_rows - ec.cursor_y > 1)
-      editorUpdateSyntax(&ec.row[ec.cursor_y + 1]);
+        editorUpdateSyntax(&ec.row[ec.cursor_y + 1]);
     ec.cursor_x = ec.cursor_y == ec.num_rows ? 0 : ec.row[ec.cursor_y].size;
+    editorSetStatusMessage("Content cut");
 }
 
 void editorPaste() {
@@ -1011,6 +1034,31 @@ void editorRowDelChar(editor_row* row, int at) {
     row -> size--;
     editorUpdateRow(row);
     ec.dirty++;
+}
+
+void editorRowDelString(editor_row* row, int at, int len) {
+    if (at < 0 || (at + len - 1) >= row -> size)
+        return;
+    // Overwriting the deleted string with the characters that come
+    // after it.
+    memmove(&row -> chars[at], &row -> chars[at + len], row -> size - (at + len) + 1);
+    row -> size -= len;
+    editorUpdateRow(row);
+    ec.dirty += len;
+}
+
+void editorRowInsertString(editor_row* row, int at, char* str) {
+    int len = strlen(str);
+    if (at < 0 || at > row -> size)
+        return;
+    row->chars = realloc(row->chars, row->size + strlen(str) + 2);
+    // Move 'after-at' part of string content to the end.
+    memmove(&row -> chars[at + len], &row -> chars[at], row -> size - at);
+    // Copy contents of str into the created space.
+    memcpy(&row -> chars[at], str, strlen(str));
+    row -> size += len;
+    editorUpdateRow(row);
+    ec.dirty += len;
 }
 
 /*** Editor operations ***/
@@ -1231,6 +1279,324 @@ void editorSearch() {
         ec.cursor_y = saved_cursor_y;
         ec.col_offset = saved_col_offset;
         ec.row_offset = saved_row_offset;
+    }
+}
+
+/*** Undo Redo section ***/
+
+typedef struct Action Action;
+struct Action {
+    ActionType t;
+    int cpos_x;
+    int cpos_y;
+    bool cursor_on_tilde;
+    char* string;
+};
+
+Action* createAction(char* str, ActionType t) {
+    Action* newAction = malloc(sizeof(Action));
+    newAction->t = t;
+    newAction->cpos_x = ec.cursor_x;
+    newAction->cpos_y = ec.cursor_y;
+    newAction->cursor_on_tilde = (ec.cursor_y == ec.num_rows);
+    newAction->string = str;
+    return newAction;
+}
+
+void freeAction(Action *action) {
+    if(action) {
+        if(action->string) free(action->string);
+        free(action);
+    }
+}
+
+void execute(Action* action) {
+    if(!action) return;
+    switch(action->t) {
+        case InsertChar:
+            {
+                ec.cursor_x = action->cpos_x;
+                ec.cursor_y = action->cpos_y;
+                if(ec.cursor_y < ec.num_rows) {
+                    editorRowInsertString(&ec.row[ec.cursor_y], ec.cursor_x, action->string);
+                    ec.cursor_x += strlen(action->string);
+                } else {
+                    editorInsertChar((int)(*action->string));
+                }
+            }
+            break;
+        case DelChar:
+            {
+                ec.cursor_x = action->cpos_x;
+                ec.cursor_y = action->cpos_y;
+                editorDelChar();
+            }
+            break;
+        case PasteLine:
+            {
+                ec.cursor_x = action->cpos_x;
+                ec.cursor_y = action->cpos_y;
+                // store current copied char buffer
+                char* curr_copy_buffer = ec.copied_char_buffer;
+                // set editor copy buffer to action string
+                ec.copied_char_buffer = action->string;
+                editorPaste();
+                // reset editor copy buffer
+                ec.copied_char_buffer = curr_copy_buffer;
+            }
+            break;
+        case CutLine:
+            {
+                ec.cursor_x = action->cpos_x;
+                ec.cursor_y = action->cpos_y;
+                editorCut();
+            }
+            break;
+        case FlipDown:
+            {
+                ec.cursor_x = action->cpos_x;
+                ec.cursor_y = action->cpos_y;
+                editorFlipRow(-1);
+            }
+            break;
+        case FlipUp:
+            {
+                ec.cursor_x = action->cpos_x;
+                ec.cursor_y = action->cpos_y;
+                editorFlipRow(1);
+            }
+            break;
+        case NewLine:
+            {
+                ec.cursor_x = action->cpos_x;
+                ec.cursor_y = action->cpos_y;
+                editorInsertNewline();
+            }
+            break;
+        default: break;
+    }
+}
+
+void revert(Action *action) {
+    if(!action) return;
+    switch(action->t) {
+        case InsertChar:
+            {
+                ec.cursor_x = action->cpos_x;
+                ec.cursor_y = action->cpos_y;
+                editorRowDelString(&ec.row[ec.cursor_y], ec.cursor_x, strlen(action->string));
+                if(action->cursor_on_tilde)
+                    editorDelRow(ec.cursor_y);
+            }
+            break;
+        case DelChar:
+            {
+                if(action->string) {
+                    ec.cursor_x = action->cpos_x - 1;
+                    ec.cursor_y = action->cpos_y;
+                    int c = *(action->string);
+                    editorInsertChar(c);
+                } else {
+                    editorInsertNewline();
+                }
+            }
+            break;
+        case PasteLine:
+            {
+                ec.cursor_x = action->cpos_x;
+                ec.cursor_y = action->cpos_y;
+                editor_row* row = &ec.row[ec.cursor_y];
+                if(action->string) {
+                    editorRowDelString(row, ec.cursor_x, strlen(action->string));
+                    if(action->cursor_on_tilde) editorDelRow(ec.cursor_y);
+                }
+            }
+            break;
+        case CutLine:
+            {
+                ec.cursor_x = 0;
+                ec.cursor_y = action->cpos_y;
+                editorInsertRow(ec.cursor_y, "", 0);
+                // store current copied char buffer
+                char* curr_copy_buffer = ec.copied_char_buffer;
+                // set editor copy buffer to action string
+                ec.copied_char_buffer = action->string;
+                editorPaste();
+                // reset editor copy buffer
+                ec.copied_char_buffer = curr_copy_buffer;
+            }
+            break;
+        case FlipDown:
+            {
+                ec.cursor_x = action->cpos_x;
+                ec.cursor_y = action->cpos_y + 1;
+                editorFlipRow(1);
+            }
+            break;
+        case FlipUp:
+            {
+                ec.cursor_x = action->cpos_x;
+                ec.cursor_y = action->cpos_y - 1;
+                editorFlipRow(-1);
+            }
+            break;
+        case NewLine:
+            {
+                ec.cursor_x = 0;
+                ec.cursor_y = action->cpos_y + 1;
+                editorDelChar();
+            }
+            break;
+        default: break;
+    }
+}
+
+typedef struct AListNode AListNode;
+struct AListNode {
+    Action* action;
+    AListNode* next;
+    AListNode* prev;
+};
+
+struct ActionList {
+    AListNode* head;
+    AListNode* tail;
+    AListNode* current;
+    int size;
+};
+
+ActionList* actionListInit() {
+    ActionList* list = malloc(sizeof(ActionList));
+    list->head = NULL;
+    list->tail = NULL;
+    list->current = NULL;
+    list->size = 0;
+    return list;
+}
+
+// Frees AListNodes in actions list starting from AListNode ptr begin
+// returns number of AListNodes freed.
+int clearAlistFrom(AListNode* begin) {
+    int nodes_freed = 0;
+    if(begin && begin->prev )
+        begin->prev->next = NULL;
+    AListNode* curr_ptr = begin;
+    while( curr_ptr ) {
+        AListNode* temp = curr_ptr;
+        curr_ptr = curr_ptr->next;
+        freeAction(temp->action);
+        free(temp);
+        nodes_freed += 1;
+    }
+
+    return nodes_freed;
+}
+
+void freeAlist() {
+    ActionList* list = ec.actions;
+    if(list){
+        clearAlistFrom(list->head);
+        free(list);
+    }
+}
+
+void addAction(Action* action) {
+    ActionList* list = ec.actions;
+    AListNode* node = malloc(sizeof(AListNode));
+    node->action = action;
+    node->prev = NULL;
+    node->next = NULL;
+
+    if(list->head == NULL) {
+        list->head = node;
+        list->tail = node;
+        list->current = node;
+    } else if (list->tail == list->current) {
+        list->tail->next = node;
+        node->prev = list->tail;
+        list->tail = node;
+        list->current = node;
+    } else {
+        AListNode* clear_from = list->current == NULL ? list->head : list->current->next;
+        int nodes_freed = clearAlistFrom(clear_from);
+        list->size -= nodes_freed;
+        if(list->current) {
+            list->current->next = node;
+            node->prev = list->current;
+            list->tail = node;
+            list->current = node;
+        } else {
+            list->current = list->head = list->tail = node;
+        }
+    }
+    list->size += 1;
+
+    // Truncate list to fit at max `ACTIONS_LIST_MAX_SIZE` actions
+    if((list->size > ACTIONS_LIST_MAX_SIZE) && (ACTIONS_LIST_MAX_SIZE != -1)) {
+        AListNode* tmp = list->head;
+        list->head = list->head->next;
+        list->size -= 1;
+        if(list->size == 0)
+            list->current = list->tail = NULL;
+        freeAction(tmp->action);
+        free(tmp);
+        if(list->head)
+            list->head->prev = NULL;
+    }
+}
+
+// If last action is InsertChar operation and the current action is also InsertChar
+// Instead of creating new action, this function concats the char to the
+// stored string in last action provided the current action does append at the end of the row
+bool concatWithLastAction(ActionType t, char* str) {
+    if(t == InsertChar &&
+       ec.actions->current &&
+       ec.actions->current == ec.actions->tail &&
+       ec.actions->current->action->t == t &&
+       ec.actions->current->action->cpos_y == ec.cursor_y &&
+       (int)(ec.actions->current->action->cpos_x + strlen(ec.actions->current->action->string)) == ec.cursor_x
+    ) {
+        int c = *(str);
+        editorInsertChar(c);
+        char* string = ec.actions->current->action->string;
+        string = realloc(string, strlen(string) + 2);
+        strcat(string, str);
+        ec.actions->current->action->string = string;
+        free(str);
+        return true;
+    }
+    return false;
+}
+
+// Creates Action, adds it to ActionList and executes it.
+// Takes ActionType and char* as paramaters for use in undo/redo operation
+void makeAction(ActionType t, char* str) {
+    if(!concatWithLastAction(t, str)) {
+        Action* newAction = createAction(str, t);
+        addAction(newAction);
+        execute(newAction);
+    }
+}
+
+void undo() {
+    ActionList* list = ec.actions;
+    if(list && list->current) {
+        revert(list->current->action);
+        // may set current to NULL
+        list->current = list->current->prev;
+    }
+}
+
+void redo() {
+    ActionList* list = ec.actions;
+    if(list && list->current && list->current->next) {
+        execute(list->current->next->action);
+        list->current = list->current->next;
+    }
+    // when current points to NULL but head is not NULL, do head
+    if(list && list->head && !list->current) {
+        list->current = list->head;
+        execute(list->current->action);
     }
 }
 
@@ -1563,7 +1929,7 @@ void editorProcessKeypress() {
 
     switch (c) {
         case '\r': // Enter key
-            editorInsertNewline();
+            makeAction(NewLine, NULL);
             break;
         case CTRL_KEY('q'):
             if (ec.dirty && quit_times > 0) {
@@ -1572,6 +1938,7 @@ void editorProcessKeypress() {
                 return;
             }
             editorClearScreen();
+            freeAlist();
             consoleBufferClose();
             exit(0);
             break;
@@ -1580,22 +1947,34 @@ void editorProcessKeypress() {
             break;
         case CTRL_KEY('e'):
             if (ec.cursor_y > 0 && ec.cursor_y <= ec.num_rows - 1)
-                editorFlipRow(1);
+                makeAction(FlipUp, NULL);
             break;
         case CTRL_KEY('d'):
             if (ec.cursor_y < ec.num_rows - 1)
-            editorFlipRow(-1);
+                makeAction(FlipDown, NULL);
             break;
         case CTRL_KEY('x'):
-            if (ec.cursor_y < ec.num_rows)
-            editorCut();
+            {
+                if (ec.cursor_y < ec.num_rows) {
+                    editorCopy(NO_STATUS);
+                    char* string = NULL;
+                    if(ec.copied_char_buffer)
+                        string = strndup(ec.copied_char_buffer, strlen(ec.copied_char_buffer));
+                    makeAction(CutLine, string);
+                }
+            }
             break;
         case CTRL_KEY('c'):
             if (ec.cursor_y < ec.num_rows)
-            editorCopy(0);
+                editorCopy(STATUS_YES);
             break;
         case CTRL_KEY('v'):
-            editorPaste();
+            {
+                char* string = NULL;
+                if(ec.copied_char_buffer)
+                    string = strndup(ec.copied_char_buffer, strlen(ec.copied_char_buffer));
+                makeAction(PasteLine, string);
+            }
             break;
         case CTRL_KEY('p'):
             consoleBufferClose();
@@ -1633,22 +2012,36 @@ void editorProcessKeypress() {
         case BACKSPACE:
         case CTRL_KEY('h'):
         case DEL_KEY:
-            if (c == DEL_KEY)
-                editorMoveCursor(ARROW_RIGHT);
-            editorDelChar();
+            {
+                if(ec.cursor_x == 0 && ec.cursor_y == 0) break;
+                if (c == DEL_KEY)
+                    editorMoveCursor(ARROW_RIGHT);
+                editor_row* row = &ec.row[ec.cursor_y];
+                char* string = ec.cursor_x > 0 ? strndup(&row->chars[ec.cursor_x-1], 1) : NULL;
+                makeAction(DelChar, string);
+            }
             break;
         case CTRL_KEY('l'):
         case '\x1b': // Escape key
             break;
         case '\t':
-            if (ec.use_tabs == 0)
-                for (int i = 0; i < TTE_TAB_STOP; i++)
-                    editorInsertChar(' ');
-            else
-                editorInsertChar(c);
+            {
+                if (ec.use_tabs == 0) {
+                    char space = ' ';
+                    for (int i = 0; i < TTE_TAB_STOP; i++)
+                        makeAction(InsertChar, strndup(&space, 1));
+                }
+                else makeAction(InsertChar, strndup((char*) &c, 1));
+            }
+            break;
+        case CTRL_KEY('z'):
+            undo();
+            break;
+        case CTRL_KEY('y'):
+            redo();
             break;
         default:
-            editorInsertChar(c);
+            makeAction(InsertChar, strndup((char*) &c, 1));
             break;
     }
 
@@ -1673,6 +2066,7 @@ void initEditor() {
     ec.status_msg_time = 0;
     ec.copied_char_buffer = NULL;
     ec.syntax = NULL;
+    ec.actions = actionListInit();
 
     editorUpdateWindowSize();
     // The SIGWINCH signal is sent to a process when its controlling
@@ -1696,6 +2090,8 @@ void printHelp() {
     printf("Ctrl-C        Copy line\n");
     printf("Ctrl-X        Cut line\n");
     printf("Ctrl-V        Paste line\n");
+    printf("Ctrl-Z        Undo\n");
+    printf("Ctrl-Y        Redo\n");
     printf("Ctrl-P        Pause tte (type \"fg\" to resume)\n");
 
     printf("\n\nOPTIONS\n-------\n\n");
