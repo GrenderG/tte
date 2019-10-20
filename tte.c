@@ -765,7 +765,7 @@ void editorApplySyntaxHighlight() {
 
 void editorSelectSyntaxHighlight() {
     ec.syntax = NULL;
-    if (ec.file_name == NULL)
+    if (ec.file_name == NULL && ec.extension[0] == '\0')
         return;
 
     char* ext_name = ec.extension[0] == '\0' ? ec.file_name : ec.extension;
@@ -1687,44 +1687,51 @@ void initEditor() {
 void printHelp() {
     printf("Usage: tte [OPTIONS] [FILE]\n\n");
     printf("\nKEYBINDINGS\n-----------\n\n");
-    printf("Keybinding\t\tAction\n\n");
-    printf("Ctrl-Q    \t\tExit\n");
-    printf("Ctrl-S    \t\tSave\n");
-    printf("Ctrl-F    \t\tSearch. Esc, enter and arrows to interact once searching\n");
-    printf("Ctrl-E    \t\tFlip line upwards\n");
-    printf("Ctrl-D    \t\tFlip line downwards\n");
-    printf("Ctrl-C    \t\tCopy line\n");
-    printf("Ctrl-X    \t\tCut line\n");
-    printf("Ctrl-V    \t\tPaste line\n");
-    printf("Ctrl-P    \t\tPause tte (type \"fg\" to resume)\n");
+    printf("Keybinding    Action\n\n");
+    printf("Ctrl-Q        Exit\n");
+    printf("Ctrl-S        Save\n");
+    printf("Ctrl-F        Search. Esc, enter and arrows to interact once searching\n");
+    printf("Ctrl-E        Flip line upwards\n");
+    printf("Ctrl-D        Flip line downwards\n");
+    printf("Ctrl-C        Copy line\n");
+    printf("Ctrl-X        Cut line\n");
+    printf("Ctrl-V        Paste line\n");
+    printf("Ctrl-P        Pause tte (type \"fg\" to resume)\n");
 
     printf("\n\nOPTIONS\n-------\n\n");
-    printf("Option        \t\tAction\n\n");
-    printf("-h | --help   \t\tPrints the help\n");
-    printf("-v | --version\t\tPrints the version of tte\n");
+    printf("Option                                          Action\n\n");
+    printf("-h | --help                                     Prints the help\n");
+    printf("-v | --version                                  Prints the version of tte\n");
+    printf("-e | --extension <file_extension> <file_name>   Specify the file extension\n");
+    printf("-t | --use-tabs [file_name]                     Use tabs instead of spaces\n");
 
     printf("\n\nFor now, usage of ISO 8859-1 is recommended.\n");
 }
 
-// 1 if editor should open, 0 otherwise, -1 if the program should exit
+// > 0 if editor should load a file, 0 otherwise and -1 if the program should exit
 int handleArgs(int argc, char* argv[]) {
     if (argc == 1)
         return 0;
 
-    if (argc >= 2) {
+    if (argc > 1) {
         if (strncmp("-h", argv[1], 2) == 0 || strncmp("--help", argv[1], 6) == 0) {
             printHelp();
             return -1;
         } else if (strncmp("-v", argv[1], 2) == 0 || strncmp("--version", argv[1], 9) == 0) {
             printf("tte - version %s\n", TTE_VERSION);
             return -1;
-        } else if (strncmp("--use-tabs", argv[1], 10) == 0){
-            ec.use_tabs = 1;
-            return 1;
+        } else if (strncmp("-t", argv[1], 2) == 0 || strncmp("--use-tabs", argv[1], 10) == 0) {
+        	ec.use_tabs = 1;
+        	return argc > 2 ? 2 : 0;
         } else if (strncmp("-e", argv[1], 2) == 0 || strncmp("--extension", argv[1], 11) == 0) {
-            size_t len = strlen(argv[2]);
-            strncpy(ec.extension, argv[2], len);
-            return 2;
+        	if (argc > 3) {
+	            size_t len = strlen(argv[2]);
+	            strncpy(ec.extension, argv[2], len);
+	            return 4;
+        	} else {
+        		printf("[ERROR] You must specify an extension and a file name\n");
+        		return -1;
+        	}
         }
     }
 
@@ -1734,10 +1741,8 @@ int handleArgs(int argc, char* argv[]) {
 int main(int argc, char* argv[]) {
     initEditor();
     int arg_response = handleArgs(argc, argv);
-    if (arg_response == 1)
-        editorOpen(argv[1]);
-    else if (arg_response == 2)
-        editorOpen(argv[3]);
+    if (arg_response > 0)
+        editorOpen(argv[argc - 1]);
     else if (arg_response == -1)
         return 0;
     enableRawMode();
