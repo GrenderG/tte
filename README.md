@@ -26,8 +26,8 @@ sudo chmod +x /usr/local/bin/tte
 tte [file_name]
 tte -h | --help
 tte -v | --version
-tte -e | --extension .sh bash_script
-tte --use-tabs <filename>
+tte -e | --extension <file_extension> <file_name>
+tte -t | --use-tabs [file_name]
 ```
 If you are planning to use special characters like (á, é, í, ó, ú, ¡, ¿, ...) you must use `ISO 8859-1` encoding in your terminal. See [this issue](https://github.com/GrenderG/tte/issues/2) for more info.
 
