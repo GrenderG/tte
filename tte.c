@@ -765,7 +765,7 @@ void editorApplySyntaxHighlight() {
 
 void editorSelectSyntaxHighlight() {
     ec.syntax = NULL;
-    if (ec.file_name == NULL && ec.extension[0] == '\0')
+    if (ec.file_name == NULL)
         return;
 
     char* ext_name = ec.extension[0] == '\0' ? ec.file_name : ec.extension;
@@ -1721,17 +1721,17 @@ int handleArgs(int argc, char* argv[]) {
             printf("tte - version %s\n", TTE_VERSION);
             return -1;
         } else if (strncmp("-t", argv[1], 2) == 0 || strncmp("--use-tabs", argv[1], 10) == 0) {
-        	ec.use_tabs = 1;
-        	return argc > 2 ? 2 : 0;
+            ec.use_tabs = 1;
+            return argc > 2 ? 2 : 0;
         } else if (strncmp("-e", argv[1], 2) == 0 || strncmp("--extension", argv[1], 11) == 0) {
-        	if (argc > 3) {
-	            size_t len = strlen(argv[2]);
-	            strncpy(ec.extension, argv[2], len);
-	            return 4;
-        	} else {
-        		printf("[ERROR] You must specify an extension and a file name\n");
-        		return -1;
-        	}
+            if (argc > 3) {
+                size_t len = strlen(argv[2]);
+                strncpy(ec.extension, argv[2], len);
+                return 4;
+            } else {
+                printf("[ERROR] You must specify an extension and a file name\n");
+                return -1;
+            }
         }
     }
 
