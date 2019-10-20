@@ -27,6 +27,7 @@ tte [file_name]
 tte -h | --help
 tte -v | --version
 tte -e | --extension .sh bash_script
+tte --use-tabs <filename>
 ```
 If you are planning to use special characters like (á, é, í, ó, ú, ¡, ¿, ...) you must use `ISO 8859-1` encoding in your terminal. See [this issue](https://github.com/GrenderG/tte/issues/2) for more info.
 

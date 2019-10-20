@@ -50,7 +50,7 @@
 // Empty buffer
 #define ABUF_INIT {NULL, 0}
 // Version code
-#define TTE_VERSION "0.0.7"
+#define TTE_VERSION "0.0.8"
 // Length of a tab stop
 #define TTE_TAB_STOP 4
 // Times to press Ctrl-Q before exiting
@@ -105,6 +105,7 @@ struct editor_config {
     int num_rows; // Number of rows
     editor_row* row;
     int dirty; // To know if a file has been modified since opening.
+    unsigned use_tabs : 1; // 1 means use tabs as tabs, 0 means spaces
     char* file_name;
     char extension[10];
     char status_msg[80];
@@ -1639,6 +1640,13 @@ void editorProcessKeypress() {
         case CTRL_KEY('l'):
         case '\x1b': // Escape key
             break;
+        case '\t':
+            if (ec.use_tabs == 0)
+                for (int i = 0; i < TTE_TAB_STOP; i++)
+                    editorInsertChar(' ');
+            else
+                editorInsertChar(c);
+            break;
         default:
             editorInsertChar(c);
             break;
@@ -1658,6 +1666,7 @@ void initEditor() {
     ec.num_rows = 0;
     ec.row = NULL;
     ec.dirty = 0;
+    ec.use_tabs = 0;
     ec.file_name = NULL;
     ec.extension[0] = '\0';
     ec.status_msg[0] = '\0';
@@ -1706,9 +1715,12 @@ int handleArgs(int argc, char* argv[]) {
         if (strncmp("-h", argv[1], 2) == 0 || strncmp("--help", argv[1], 6) == 0) {
             printHelp();
             return -1;
-        } else if(strncmp("-v", argv[1], 2) == 0 || strncmp("--version", argv[1], 9) == 0) {
+        } else if (strncmp("-v", argv[1], 2) == 0 || strncmp("--version", argv[1], 9) == 0) {
             printf("tte - version %s\n", TTE_VERSION);
             return -1;
+        } else if (strncmp("--use-tabs", argv[1], 10) == 0){
+            ec.use_tabs = 1;
+            return 1;
         } else if (strncmp("-e", argv[1], 2) == 0 || strncmp("--extension", argv[1], 11) == 0) {
             size_t len = strlen(argv[2]);
             strncpy(ec.extension, argv[2], len);
