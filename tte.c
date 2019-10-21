@@ -1501,6 +1501,7 @@ void freeAlist() {
 }
 
 void addAction(Action* action) {
+    if(ACTIONS_LIST_MAX_SIZE == 0) return;
     ActionList* list = ec.actions;
     AListNode* node = malloc(sizeof(AListNode));
     node->action = action;
@@ -1550,6 +1551,7 @@ void addAction(Action* action) {
 // stored string in last action provided the current action does append at the end of the row
 bool concatWithLastAction(ActionType t, char* str) {
     if(t == InsertChar &&
+       ACTIONS_LIST_MAX_SIZE &&
        ec.actions->current &&
        ec.actions->current == ec.actions->tail &&
        ec.actions->current->action->t == t &&
@@ -1573,21 +1575,26 @@ bool concatWithLastAction(ActionType t, char* str) {
 void makeAction(ActionType t, char* str) {
     if(!concatWithLastAction(t, str)) {
         Action* newAction = createAction(str, t);
-        addAction(newAction);
+        if(ACTIONS_LIST_MAX_SIZE) addAction(newAction);
         execute(newAction);
     }
 }
 
 void undo() {
+    if(ACTIONS_LIST_MAX_SIZE == 0) return;
     ActionList* list = ec.actions;
     if(list && list->current) {
         revert(list->current->action);
         // may set current to NULL
         list->current = list->current->prev;
     }
+    if((list->current == NULL) && (ACTIONS_LIST_MAX_SIZE)) {
+        ec.dirty = 0;
+    }
 }
 
 void redo() {
+    if(ACTIONS_LIST_MAX_SIZE == 0) return;
     ActionList* list = ec.actions;
     if(list && list->current && list->current->next) {
         execute(list->current->next->action);
