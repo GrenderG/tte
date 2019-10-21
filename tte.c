@@ -51,7 +51,7 @@
 // Empty buffer
 #define ABUF_INIT {NULL, 0}
 // Version code
-#define TTE_VERSION "0.0.8"
+#define TTE_VERSION "0.1.0"
 // Length of a tab stop
 #define TTE_TAB_STOP 4
 // Times to press Ctrl-Q before exiting
@@ -65,7 +65,7 @@
 // Max Undo/Redo Operations
 // Set to -1 for unlimited Undo
 // Set to 0 to disable Undo
-#define ACTIONS_LIST_MAX_SIZE 50
+#define ACTIONS_LIST_MAX_SIZE 80
 
 typedef struct ActionList ActionList;
 
@@ -1282,7 +1282,7 @@ void editorSearch() {
     }
 }
 
-/*** Undo Redo section ***/
+/*** Action section ***/
 
 typedef struct Action Action;
 struct Action {
