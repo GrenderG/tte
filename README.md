@@ -1,3 +1,5 @@
+[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/R6R21LO82)
+
 # tte
 
 tte (tiny text editor) is a terminal based text editor written in C from scratch, trying to be very minimalistic and dependency independent (it's not even using **curses**).
