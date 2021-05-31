@@ -187,7 +187,7 @@ char* C_HL_keywords[] = {
     "switch", "if", "while", "for", "break", "continue", "return", "else",
     "struct", "union", "typedef", "static", "enum", "class", "case", "#include",
     "volatile", "register", "sizeof", "typedef", "union", "goto", "const", "auto",
-    "#define", "#if", "#endif", "#error", "#ifdef", "#ifndef", "#undef",
+    "#define", "#if", "#endif", "#error", "#ifdef", "#ifndef", "#undef", "extern" ,
 
     "int|", "long|", "double|", "float|", "char|", "unsigned|", "signed|",
     "void|", "bool|", NULL
