@@ -188,6 +188,7 @@ char* C_HL_keywords[] = {
     "struct", "union", "typedef", "static", "enum", "class", "case", "#include",
     "volatile", "register", "sizeof", "typedef", "union", "goto", "const", "auto",
     "#define", "#if", "#endif", "#error", "#ifdef", "#ifndef", "#undef",
+    "asm" /* in stdbool.h  */ , "bool" , "true" , "fasle" , "inline" ,
 
     "int|", "long|", "double|", "float|", "char|", "unsigned|", "signed|",
     "void|", "bool|", NULL
