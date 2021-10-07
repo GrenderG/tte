@@ -174,10 +174,10 @@ typedef enum ActionType ActionType;
 
 char* C_HL_extensions[] = {".c", ".h", ".cpp", ".hpp", ".cc", NULL}; // Array must be terminated with NULL.
 char* JAVA_HL_extensions[] = {".java", NULL};
-char* PYTHON_HL_extensions[] = {".py", NULL};
+char* PYTHON_HL_extensions[] = {".py",".pyw",".py3",".pyc",".pyo", NULL};
 char* BASH_HL_extensions[] = {".sh", NULL};
 char* JS_HL_extensions[] = {".js", ".jsx", NULL};
-char* PHP_HL_extensions[] = {".php", NULL};
+char* PHP_HL_extensions[] = {".php",".phtml", NULL};
 char* JSON_HL_extensions[] = {".json", ".jsonp", NULL};
 char* XML_HL_extensions[] = {".xml", NULL};
 char* SQL_HL_extensions[] = {".sql", NULL};
