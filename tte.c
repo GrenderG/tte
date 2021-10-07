@@ -353,7 +353,6 @@ struct editor_syntax HL_DB[] = {
         "//",
         "/*",
         "*/",
-        "#",
         HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
     },
     {
