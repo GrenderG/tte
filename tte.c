@@ -185,9 +185,15 @@ char* RUBY_HL_extensions[] = {".rb", NULL};
 
 char* C_HL_keywords[] = {
     "switch", "if", "while", "for", "break", "continue", "return", "else",
-    "struct", "union", "typedef", "static", "enum", "class", "case", "#include",
+    "struct", "union", "typedef", "static", "enum", "case", "#include",
     "volatile", "register", "sizeof", "typedef", "union", "goto", "const", "auto",
-    "#define", "#if", "#endif", "#error", "#ifdef", "#ifndef", "#undef", "extern" ,
+    "#define", "#if", "#endif", "#error", "#ifdef", "#ifndef", "#undef",
+    
+    // C++
+    "class" , "namespace" , "using" , "catch" , "delete" , "explicit" ,
+    "export" , "friend" , "mutable" , "new" , "public" , "protected" ,
+    "private" , "operator" , "this" , "template" , "virtual" , "throw" ,
+    "try" , "typeid" ,
 
     "int|", "long|", "double|", "float|", "char|", "unsigned|", "signed|",
     "void|", "bool|", NULL
